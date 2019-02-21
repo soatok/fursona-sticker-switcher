@@ -1,0 +1,12 @@
+body {
+    background-color: #333;
+    color: #eee;
+}
+#symlink-path-container label {
+    display: inline-block;
+    text-align: right;
+    width: 100px;
+}
+#symlink-path {
+    width: calc(100% - 110px);
+}

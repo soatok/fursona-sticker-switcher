@@ -1,0 +1,23 @@
+{
+  "name": "twitch-fursona-stickers",
+  "version": "0.0.1",
+  "description": "Dynamic image swapping for furry live-streamers. (Character stills, Telegram stickers, etc.)",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/soatok/twitch-fursona-stickers",
+  "keywords": [
+    "furry",
+    "furries",
+    "streaming"
+  ],
+  "author": "Soatok Dreamseeker",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^4.0.4"
+  },
+  "dependencies": {
+    "array-move": "^1.0.0"
+  }
+}
