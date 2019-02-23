@@ -6,6 +6,11 @@
   "scripts": {
     "start": "electron ."
   },
+  "build": {
+    "win": {
+      "requestedExecutionLevel": "highestAvailable"
+    }
+  },
   "repository": "https://github.com/soatok/twitch-fursona-stickers",
   "keywords": [
     "furry",

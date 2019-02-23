@@ -11,6 +11,7 @@ window.$ = window.jQuery = require('jquery');
 let myConsole = new nodeConsole.Console(process.stdout, process.stderr);
 let activeProfile;
 let activeProfilePath;
+let isWindowsAdmin = false;
 
 function appendImage(imageObject, index = 0) {
     // Draw an image, with a unique ID and common class.
@@ -135,7 +136,11 @@ function selectImage(activeImage) {
             fs.unlinkSync(activeProfile.getSymlink());
         }
         if (process.platform === "win32") {
-            return fs.symlinkSync(activeImage, activeProfile.getSymlink(), 'junction');
+            if (isWindowsAdmin) {
+                return fs.symlinkSync(activeImage, activeProfile.getSymlink());
+            } else {
+                return fs.copyFileSync(activeImage, activeProfile.getSymlink());
+            }
         } else {
             return fs.symlinkSync(activeImage, activeProfile.getSymlink());
         }
@@ -168,6 +173,12 @@ function stickerOnClickEvent() {
 menuNewProfile();
 redrawImages();
 
+if (process.platform === "win32") {
+    let exec = require('child_process').exec;
+    exec('NET SESSION', function (err, so, se) {
+        isWindowsAdmin = se.length === 0;
+    });
+}
 $("#symlink-path").on('change', function () {
     activeProfile.setSymlinkPath($(this).val());
 });
