@@ -65,10 +65,18 @@ class Stickers
     }
 
     static defaultProfile() {
+        if (process.platform === "win32") {
+            return new Stickers({
+                "version": 1,
+                "name": "",
+                "symlink": process.env.USERPROFILE + "\\" + Stickers.randomFileName(),
+                "images": []
+            })
+        }
         return new Stickers({
             "version": 1,
             "name": "",
-            "symlink": process.env.HOME + "/" + Stickers.randomFileName() + ".fur",
+            "symlink": process.env.HOME + "/" + Stickers.randomFileName(),
             "images": []
         })
     }

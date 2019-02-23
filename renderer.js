@@ -129,13 +129,16 @@ function renderImagePreview(imageObject, index = 0) {
 }
 
 function selectImage(activeImage) {
-
     try {
         // Change symlink to file
         if (fs.existsSync(activeProfile.getSymlink())) {
             fs.unlinkSync(activeProfile.getSymlink());
         }
-        return fs.symlinkSync(activeImage, activeProfile.getSymlink());
+        if (process.platform === "win32") {
+            return fs.copyFileSync(activeImage, activeProfile.getSymlink());
+        } else {
+            return fs.symlinkSync(activeImage, activeProfile.getSymlink());
+        }
     } catch (e) {
         myConsole.log(e);
     }
