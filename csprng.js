@@ -43,6 +43,5 @@ function randomInt (min = 0, max = 65535) {
        // CSPRNG not available, fail closed
        throw Error('placeholder; this should be customized with accordance to whatever practices are best for Node.js')
    }
-};
-
+}
 module.exports = randomInt;
