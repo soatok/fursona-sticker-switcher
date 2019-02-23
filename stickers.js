@@ -53,6 +53,10 @@ class Stickers
         return this.version;
     }
 
+    setName(str) {
+        this.name = str;
+    }
+
     static defaultProfile() {
         return new Stickers({
             "version": 1,
@@ -63,9 +67,7 @@ class Stickers
     }
 
     static loadFromProfile(path = "") {
-        return fs.readFileSync(path, (err, data) => {
-            return new Stickers(JSON.parse(data))
-        })
+        return new Stickers(JSON.parse(fs.readFileSync(path).toString()));
     }
 
     static randomFileName(len = 16) {
