@@ -28,3 +28,13 @@ Electron.js
 
 * Multiple windows
 * Communication between windows/etc.
+
+### TODO 
+
+* iterates on all class="sticker"
+  * Add an on('click') handler to update symlink
+  * Add a context menu to delete
+  * Drag n' drop to rearrange
+* Drag images directly into the app from e.g. Windows Explorer
+* Detect unsaved changes, prompt before closing
+* Load the last saved profile

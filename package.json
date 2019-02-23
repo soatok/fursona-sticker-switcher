@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "array-move": "^1.0.0",
-    "electron-prompt": "^1.3.0"
+    "electron-prompt": "^1.3.0",
+    "jquery": "^3.3.1"
   }
 }

@@ -6,16 +6,21 @@ const nodeConsole = require('console');
 const prompt = require('electron-prompt');
 const Stickers = require('./stickers.js');
 
+window.$ = window.jQuery = require('jquery');
+
 let myConsole = new nodeConsole.Console(process.stdout, process.stderr);
 let activeProfile;
 let activeProfilePath;
 
-function appendImage(imageObject) {
+function appendImage(imageObject, index = 0) {
     // Draw an image, with a unique ID and common class.
     //
     // An onclick handler will be created to swap images out.
     try {
-        document.getElementById('sticker-container').innerHTML += renderImagePreview(imageObject);
+        $('#sticker-container').append(
+            renderImagePreview(imageObject, index)
+        );
+        $('.sticker[data-index=' + index + ']').on('click', stickerOnClickEvent);
     } catch (e) {
         myConsole.log(e);
     }
@@ -28,7 +33,7 @@ function escapeImagePath(str) {
 function menuNewProfile() {
     activeProfile = Stickers.defaultProfile();
     activeProfilePath = "";
-    document.getElementById('symlink-path').value = activeProfile.getSymlink();
+    $('#symlink-path').val(activeProfile.getSymlink());
     redrawImages();
 }
 
@@ -39,7 +44,7 @@ function menuLoadProfile() {
     // Load the profile from the given JSON file
     activeProfile = Stickers.loadFromProfile(file[0]);
     activeProfilePath = file[0];
-    document.getElementById('symlink-path').value = activeProfile.getSymlink();
+    $('#symlink-path').val(activeProfile.getSymlink());
     redrawImages();
 }
 
@@ -97,8 +102,9 @@ function menuAddPhoto() {
     for (let i = 0; i < files.length; i++) {
         let newImage = {"path": files[i]};
         activeProfile.appendImage(newImage);
-        appendImage(newImage);
+        appendImage(newImage, i);
     }
+    $('.sticker').on('click', stickerOnClickEvent);
 }
 
 function redrawImages() {
@@ -106,24 +112,33 @@ function redrawImages() {
     document.getElementById('sticker-container').innerHTML = "";
 
     for (let i = 0; i < activeProfile.getImageCount(); i++) {
-        appendImage(activeProfile.getImage(i));
+        appendImage(activeProfile.getImage(i), i);
     }
+    $('.sticker').on('click', stickerOnClickEvent);
 }
 
-function renderImagePreview(imageObject) {
+function renderImagePreview(imageObject, index = 0) {
     return "<div class=\"sticker\">" +
-        "<img src='file://" + escapeImagePath(imageObject.path) + "' alt='Click to choose sticker' />" +
+        "<img " +
+            "alt='Click to choose sticker' " +
+            "data-index='" + index + "' " +
+            "data-path='" + escapeImagePath(imageObject.path) + "' " +
+            "src='file://" + escapeImagePath(imageObject.path) + "' " +
+        "/>" +
     "</div>";
 }
 
-function selectImage(e) {
-    // Take metadata from the selected image
+function selectImage(activeImage) {
 
-    let activeImage = activeProfile.getImage(e.selected);
-
-    // Change symlink to file
-    fs.unlink(activeProfile.getSymlink());
-    fs.symlink(activeProfile.getSymlink(), activeImage)
+    try {
+        // Change symlink to file
+        if (fs.existsSync(activeProfile.getSymlink())) {
+            fs.unlinkSync(activeProfile.getSymlink());
+        }
+        return fs.symlinkSync(activeImage, activeProfile.getSymlink());
+    } catch (e) {
+        myConsole.log(e);
+    }
 }
 
 ipc.on('parentFunc', (event, data) => {
@@ -142,6 +157,10 @@ ipc.on('parentFunc', (event, data) => {
             throw new Error("Function not allowed");
     }
 });
+
+function stickerOnClickEvent() {
+    return selectImage($(this).find("img").data("path"));
+}
 
 menuNewProfile();
 redrawImages();
