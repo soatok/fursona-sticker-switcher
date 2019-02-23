@@ -16,8 +16,13 @@ body {
     display: inline-block;
     margin: 0.5ex;
     padding: 0.25ex;
+    transition: background-color 0.2s;
+}
+.sticker:hover {
+    background-color: #111;
 }
 .sticker img {
+    cursor: pointer;
     width: 240px;
     max-height: 320px;
 }
