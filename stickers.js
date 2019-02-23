@@ -8,6 +8,7 @@ class Stickers
         if (typeof(data) !== "object") {
             throw TypeError("An object was expected");
         }
+        this.version = data.version || 1;
         this.name = data.name || "";
         this.symlink = data.symlink || "";
         this.images = data.images || [];
@@ -48,8 +49,13 @@ class Stickers
         return this.symlink;
     }
 
+    getVersion() {
+        return this.version;
+    }
+
     static defaultProfile() {
         return new Stickers({
+            "version": 1,
             "name": "",
             "symlink": process.env.HOME + "/" + Stickers.randomFileName() + ".fur",
             "images": []
