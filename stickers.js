@@ -60,6 +60,9 @@ class Stickers
     setName(str) {
         this.name = str;
     }
+    setSymlinkPath(str) {
+        this.symlink = str;
+    }
 
     static defaultProfile() {
         return new Stickers({

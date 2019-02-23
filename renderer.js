@@ -164,3 +164,7 @@ function stickerOnClickEvent() {
 
 menuNewProfile();
 redrawImages();
+
+$("#symlink-path").on('change', function () {
+    activeProfile.setSymlinkPath($(this).val());
+});
