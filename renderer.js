@@ -135,7 +135,7 @@ function selectImage(activeImage) {
             fs.unlinkSync(activeProfile.getSymlink());
         }
         if (process.platform === "win32") {
-            return fs.copyFileSync(activeImage, activeProfile.getSymlink());
+            return fs.symlinkSync(activeImage, activeProfile.getSymlink(), 'junction');
         } else {
             return fs.symlinkSync(activeImage, activeProfile.getSymlink());
         }
