@@ -1,6 +1,5 @@
 // Modules to control application life and create native browser window
 const {app, BrowserWindow, Menu, MenuItem} = require('electron');
-const Stickers = require('./stickers.js');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -11,81 +10,81 @@ function callFunctionInWindow(name) {
 }
 
 function createIndexMenu() {
-  const indexMenu = new Menu();
-  const FileSubMenu = new Menu();
-  FileSubMenu.append(
-      new MenuItem({
-        "label": "New Profile",
-        click() {
-          return callFunctionInWindow('menuNewProfile');
-        }
-      })
-  );
-  FileSubMenu.append(
-      new MenuItem({
-        "label": "Load Profile",
-        click() {
-          return callFunctionInWindow('menuLoadProfile');
-        }
-      })
-  );
-  FileSubMenu.append(
-      new MenuItem({
-        "label": "Save Profile",
-        click() {
-          return callFunctionInWindow('menuSaveProfile');
-        }
-      })
-  );
-  FileSubMenu.append(
-    new MenuItem({
-      "label": "Save Profile As...",
-      click() {
-        return callFunctionInWindow('menuSaveProfileAs');
-      }
-    })
-  );
-  FileSubMenu.append(
-      new MenuItem({
-        "label": "Add Image",
-        click() {
-          return callFunctionInWindow('menuAddImage');
-        }
-      })
-  );
+    const indexMenu = new Menu();
+    const FileSubMenu = new Menu();
+    FileSubMenu.append(
+        new MenuItem({
+            "label": "New Profile",
+            click() {
+                return callFunctionInWindow('menuNewProfile');
+            }
+        })
+    );
+    FileSubMenu.append(
+        new MenuItem({
+            "label": "Load Profile",
+            click() {
+                return callFunctionInWindow('menuLoadProfile');
+            }
+        })
+    );
+    FileSubMenu.append(
+        new MenuItem({
+            "label": "Save Profile",
+            click() {
+                return callFunctionInWindow('menuSaveProfile');
+            }
+        })
+    );
+    FileSubMenu.append(
+        new MenuItem({
+            "label": "Save Profile As...",
+            click() {
+                return callFunctionInWindow('menuSaveProfileAs');
+            }
+        })
+    );
+    FileSubMenu.append(
+        new MenuItem({
+            "label": "Add Image",
+            click() {
+                return callFunctionInWindow('menuAddPhoto');
+            }
+        })
+    );
 
-  indexMenu.append(
-      new MenuItem({
-        "label": "File",
-        "submenu": FileSubMenu
-      })
-  );
-  return indexMenu
+    indexMenu.append(
+        new MenuItem({
+            "label": "File",
+            "submenu": FileSubMenu
+        })
+    );
+    return indexMenu
 }
 
 function createWindow () {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600
-  });
+    // Create the browser window.
+    mainWindow = new BrowserWindow({
+        width: 800,
+        height: 600
+    });
 
-  // and load the index.html of the app.
-  mainWindow.loadFile('index.html');
+    // and load the index.html of the app.
+    mainWindow.loadFile('index.html');
 
-  mainWindow.setMenu(createIndexMenu());
-  // mainWindow.setMenuBarVisibility(false)
+    mainWindow.setMenu(createIndexMenu());
+    // mainWindow.setMenuBarVisibility(false)
 
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+    // Open the DevTools.
+    // mainWindow.webContents.openDevTools()
 
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function () {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null
-  });
+    // Emitted when the window is closed.
+    mainWindow.on('closed', function () {
+        // Dereference the window object, usually you would store windows
+        // in an array if your app supports multi windows, this is the time
+        // when you should delete the corresponding element.
+        mainWindow = null
+    });
 }
 
 // This method will be called when Electron has finished
@@ -95,20 +94,20 @@ app.on('ready', createWindow)
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
-  // On macOS it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
+    // On macOS it is common for applications and their menu bar
+    // to stay active until the user quits explicitly with Cmd + Q
+    if (process.platform !== 'darwin') {
+        app.quit()
+    }
+});
 
 app.on('activate', function () {
-  // On macOS it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
-    createWindow()
-  }
-})
+    // On macOS it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
+    if (mainWindow === null) {
+        createWindow()
+    }
+});
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

@@ -10,6 +10,21 @@ let myConsole = new nodeConsole.Console(process.stdout, process.stderr);
 let activeProfile;
 let activeProfilePath;
 
+function appendImage(imageObject) {
+    // Draw an image, with a unique ID and common class.
+    //
+    // An onclick handler will be created to swap images out.
+    try {
+        document.getElementById('sticker-container').innerHTML += renderImagePreview(imageObject);
+    } catch (e) {
+        myConsole.log(e);
+    }
+}
+
+function escapeImagePath(str) {
+    return str.split("'").join("");
+}
+
 function menuNewProfile() {
     activeProfile = Stickers.defaultProfile();
     activeProfilePath = "";
@@ -76,19 +91,29 @@ function menuSaveProfileAs() {
 }
 function menuAddPhoto() {
     // Open a file dialog
+    let files = dialog.showOpenDialog({"properties": ['multiSelections']});
 
     // Append a photo
+    for (let i = 0; i < files.length; i++) {
+        let newImage = {"path": files[i]};
+        activeProfile.appendImage(newImage);
+        appendImage(newImage);
+    }
 }
 
 function redrawImages() {
     // Iterate through activeProfile.getImages(), call appendImage()
     document.getElementById('sticker-container').innerHTML = "";
+
+    for (let i = 0; i < activeProfile.getImageCount(); i++) {
+        appendImage(activeProfile.getImage(i));
+    }
 }
 
-function appendImage(path = "") {
-    // Draw an image, with a unique ID and common class.
-    //
-    // An onclick handler will be created to swap images out.
+function renderImagePreview(imageObject) {
+    return "<div class=\"sticker\">" +
+        "<img src='file://" + escapeImagePath(imageObject.path) + "' alt='Click to choose sticker' />" +
+    "</div>";
 }
 
 function selectImage(e) {

@@ -37,6 +37,10 @@ class Stickers
         return this.images[index];
     }
 
+    getImageCount() {
+        return this.images.length;
+    }
+
     getAllImages() {
         return this.images;
     }
