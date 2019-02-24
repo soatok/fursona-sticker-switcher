@@ -1,5 +1,7 @@
 # Twitch Fursona Stickers
 
+![App Screenshot](docs/img/fursona-stickers-01.png)
+
 Small GUI application that swaps out images on the fly. 
 
 Meant to be used with character stills or a personal Telegram sticker pack.
@@ -22,6 +24,8 @@ First, clone our repository using git. Then, run `npm install --save`.
 ### Windows
 
 Run `electron.exe`.
+
+![App Screenshot](docs/img/fursona-stickers-00.png)
 
 At the top of your screen, you will see a textbox labelled "Image Source".
 Copy and paste this into the file path for an Image Source in your streaming 
