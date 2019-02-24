@@ -15,6 +15,7 @@ body {
     border-radius: 0.5ex;
     display: inline-block;
     margin: 0.5ex;
+    max-width: 250px;
     padding: 2px;
     transition: background-color 0.2s;
 }
@@ -22,8 +23,10 @@ body {
     background-color: #111;
 }
 .sticker img {
+    display: block;
     cursor: pointer;
     width: 240px;
+    min-height: 240px;
     max-height: 320px;
 }
 .active {

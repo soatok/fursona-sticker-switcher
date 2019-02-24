@@ -197,12 +197,26 @@ function menuAddPhoto() {
  */
 function redrawImages() {
     // Iterate through activeProfile.getImages(), call appendImage()
-    document.getElementById('sticker-container').innerHTML = "";
+    $('#sticker-container').html(
+        renderTransparentImage()
+    );
 
     for (let i = 0; i < activeProfile.getImageCount(); i++) {
         appendImage(activeProfile.getImage(i), i);
     }
     $('.sticker').on('click', stickerOnClickEvent);
+}
+
+function renderTransparentImage() {
+    return "<div class=\"sticker\">" +
+        "<img " +
+            "class='transparent' " +
+            "alt='Click to not choose a sticker' " +
+            "data-index='-1' " +
+            "data-path='' " +
+            "src='transparent.png' " +
+        "/>" +
+    "</div>";
 }
 
 /**
@@ -233,6 +247,9 @@ function selectImage(activeImage) {
         // Change symlink to file
         if (fs.existsSync(activeProfile.getSymlink())) {
             fs.unlinkSync(activeProfile.getSymlink());
+        }
+        if (activeImage === "") {
+            return;
         }
         if (process.platform === "win32") {
             /*
