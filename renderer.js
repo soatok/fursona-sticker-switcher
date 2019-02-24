@@ -33,6 +33,28 @@ function appendImage(imageObject, index = 0) {
     }
 }
 
+function detectActiveSymlink() {
+    let link = activeProfile.getSymlink();
+    if (fs.existsSync(link)) {
+        let realpath = fs.realpathSync(link);
+        myConsole.log("Test:");
+        myConsole.log(JSON.stringify(realpath));
+        if (realpath.length > 0) {
+            let len = activeProfile.getImageCount();
+            let img;
+            for (let i = 0; i < len; i++) {
+                img = activeProfile.getImage(i);
+                if (fs.realpathSync(img['path']) === realpath) {
+                    $('.active').removeClass('active');
+                    $('#image-' + i).addClass('active');
+                    return;
+                }
+            }
+        }
+    }
+    $('#transparent-sticker').addClass('active');
+}
+
 /**
  * Prevent apostrophes from being injected in URLs;
  *
@@ -53,6 +75,10 @@ function menuNewProfile() {
     $(document).attr('title', 'New Profile' + " - Fursona Sticker Switcher");
     $('#symlink-path').val(activeProfile.getSymlink());
     redrawImages();
+    setTimeout(function() {
+        $('.active').removeClass('active');
+        $('#transparent-sticker').addClass('active');
+    }, 1);
 }
 
 /**
@@ -94,6 +120,7 @@ function loadProfile(file) {
     config.save();
     $('#symlink-path').val(activeProfile.getSymlink());
     redrawImages();
+    setTimeout(detectActiveSymlink, 1);
 }
 
 /**
@@ -210,6 +237,7 @@ function redrawImages() {
 function renderTransparentImage() {
     return "<div class=\"sticker\">" +
         "<img " +
+            "id='transparent-sticker' " +
             "class='transparent' " +
             "alt='Click to not choose a sticker' " +
             "data-index='-1' " +
@@ -229,6 +257,7 @@ function renderTransparentImage() {
 function renderImagePreview(imageObject, index = 0) {
     return "<div class=\"sticker\">" +
         "<img " +
+            "id='image-" + index + "' " +
             "alt='Click to choose sticker' " +
             "data-index='" + index + "' " +
             "data-path='" + escapeImagePath(imageObject.path) + "' " +
@@ -261,6 +290,7 @@ function selectImage(activeImage) {
             if (isWindowsAdmin) {
                 let result = fs.symlinkSync(activeImage, activeProfile.getSymlink());
                 changeTime(activeImage);
+                changeTime(activeProfile.getSymlink());
                 return result;
             } else {
                 // Do this asynchronously because it could be slower.
@@ -269,17 +299,28 @@ function selectImage(activeImage) {
                     activeProfile.getSymlink(),
                     function () {
                         changeTime(activeImage);
+                        changeTime(activeProfile.getSymlink());
                     }
                 );
             }
         } else {
             let result = fs.symlinkSync(activeImage, activeProfile.getSymlink());
             changeTime(activeImage);
+            changeTime(activeProfile.getSymlink());
             return result;
         }
     } catch (e) {
         myConsole.log(e);
     }
+}
+
+/**
+ * OnClick event handler for each sticker.
+ */
+function stickerOnClickEvent() {
+    $(".active").removeClass("active");
+    $(this).addClass("active");
+    return selectImage($(this).find("img").data("path"));
 }
 
 /**
@@ -304,15 +345,6 @@ ipc.on('parentFunc', (event, data) => {
             throw new Error("Function not allowed");
     }
 });
-
-/**
- * OnClick event handler for each sticker.
- */
-function stickerOnClickEvent() {
-    $(".active").removeClass("active");
-    $(this).addClass("active");
-    return selectImage($(this).find("img").data("path"));
-}
 
 /**
  * Startup functions
