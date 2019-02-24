@@ -41,6 +41,12 @@ function menuNewProfile() {
 function menuLoadProfile() {
     // Open a file dialog
     let file = dialog.showOpenDialog();
+    if (typeof file === 'undefined') {
+        return;
+    }
+    if (file.length < 1) {
+        return;
+    }
 
     // Load the profile from the given JSON file
     activeProfile = Stickers.loadFromProfile(file[0]);
@@ -90,7 +96,16 @@ function menuSaveFileCallback() {
 
 function menuSaveProfileAs() {
     // Open a file dialog
+    let oldValue = activeProfilePath;
     activeProfilePath = dialog.showSaveDialog();
+    if (typeof activeProfilePath === "undefined") {
+        activeProfilePath = oldValue;
+        return;
+    }
+    if (activeProfilePath === "") {
+        activeProfilePath = oldValue;
+        return;
+    }
 
     return menuSaveFileCallback();
     // Save the profile to the path specified
@@ -98,6 +113,12 @@ function menuSaveProfileAs() {
 function menuAddPhoto() {
     // Open a file dialog
     let files = dialog.showOpenDialog({"properties": ['multiSelections']});
+    if (typeof files === 'undefined') {
+        return;
+    }
+    if (files.length < 1) {
+        return;
+    }
 
     // Append a photo
     for (let i = 0; i < files.length; i++) {
