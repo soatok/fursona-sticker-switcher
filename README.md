@@ -18,3 +18,30 @@ Once you have the appropriate archive downloaded, extract it.
 First, clone our repository using git. Then, run `npm install --save`.
 
 ## Using this App
+
+### Windows
+
+Run `electron.exe`.
+
+At the top of your screen, you will see a textbox labelled "Image Source".
+Copy and paste this into the file path for an Image Source in your streaming 
+software.
+ 
+You may edit this field if you have a specific file destination in mind.
+
+Now go to File > Add Image to add your stickers.
+
+Once you click on the sticker, it should update in your streaming software.
+
+### Other Operating Systems
+
+Coming soon!
+
+## Caveats with Animated GIFs and Streamlabs OBS
+
+If you append `.gif` to the Image Source file path, you can use GIFs (but
+only GIFs) and they will animate. If you leave the image source without an
+extension, it works with all image types, but GIFs will not be animated.
+
+In the future, I'll devise a workaround (even if it means sending a pull
+request to Streamlabs OBS) to make this usability wart go away.
