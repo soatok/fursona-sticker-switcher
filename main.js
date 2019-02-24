@@ -65,7 +65,7 @@ function createIndexMenu() {
 function createWindow () {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: 800,
+        width: 810,
         height: 600
     });
 
