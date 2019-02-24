@@ -33,6 +33,11 @@ function appendImage(imageObject, index = 0) {
     }
 }
 
+/**
+ * Detect which sticker is the target of the symlink, mark it as active.
+ *
+ * Otherwise, mark the transparent space as active.
+ */
 function detectActiveSymlink() {
     let link = activeProfile.getSymlink();
     if (fs.existsSync(link)) {
