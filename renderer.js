@@ -292,6 +292,8 @@ ipc.on('parentFunc', (event, data) => {
  * OnClick event handler for each sticker.
  */
 function stickerOnClickEvent() {
+    $(".active").removeClass("active");
+    $(this).addClass("active");
     return selectImage($(this).find("img").data("path"));
 }
 

@@ -15,7 +15,7 @@ body {
     border-radius: 0.5ex;
     display: inline-block;
     margin: 0.5ex;
-    padding: 0.25ex;
+    padding: 2px;
     transition: background-color 0.2s;
 }
 .sticker:hover {
@@ -25,4 +25,34 @@ body {
     cursor: pointer;
     width: 240px;
     max-height: 320px;
+}
+.active {
+    background-image: -webkit-linear-gradient(
+        top,
+        rgba(153, 153, 153, 0.33) 0%,
+        rgba(0, 0, 0, 0.33) 100%
+    );
+    background-image: -moz-linear-gradient(
+        top,
+        rgba(153, 153, 153, 0.33) 0%,
+        rgba(0, 0, 0, 0.33) 100%
+    );
+    background-image: -ms-linear-gradient(
+        top,
+        rgba(153, 153, 153, 0.33) 0%,
+        rgba(0, 0, 0, 0.33) 100%
+    );
+    background-image: -o-linear-gradient(
+        top,
+        rgba(153, 153, 153, 0.33) 0%,
+        rgba(0, 0, 0, 0.33) 100%
+    );
+    background-image: linear-gradient(
+        top,
+        rgba(153, 153, 153, 0.33) 0%,
+        rgba(0, 0, 0, 0.33) 100%
+    );
+    padding: 0;
+    border: 2px solid #888;
+    box-shadow: inset #666 0 0 3px;
 }
