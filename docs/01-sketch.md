@@ -21,13 +21,6 @@ Electron.js
 
 * Append/reorder elements in the array of stickers
 * Remove elements from an array
-* Iterable for drawing the images to the screen
-  * Templating?
-
-### Research
-
-* Multiple windows
-* Communication between windows/etc.
 
 ### TODO 
 
