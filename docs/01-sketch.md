@@ -32,11 +32,8 @@ Electron.js
 ### TODO 
 
 * Blank default image
-* Mark source file as changed to trick OBS into uncaching:
-  https://www.npmjs.com/package/change-file-time
 * iterates on all class="sticker"
   * Add a context menu to delete
   * Drag n' drop to rearrange
 * Drag images directly into the app from e.g. Windows Explorer
 * Detect unsaved changes, prompt before closing
-* Load the last saved profile
