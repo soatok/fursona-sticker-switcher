@@ -1,4 +1,4 @@
-# Twitch Fursona Stickers
+# Fursona Sticker Switcher
 
 ![App Screenshot](docs/img/fursona-stickers-01.png)
 
