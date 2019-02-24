@@ -5,6 +5,7 @@ const fs = require('fs');
 const ipc = require('electron').ipcRenderer;
 const nodeConsole = require('console');
 const prompt = require('electron-prompt');
+const Settings = require('./settings');
 const Stickers = require('./stickers.js');
 
 window.$ = window.jQuery = require('jquery');
@@ -12,6 +13,8 @@ let myConsole = new nodeConsole.Console(process.stdout, process.stderr);
 let activeProfile;
 let activeProfilePath;
 let isWindowsAdmin = false;
+/** @var {Settings} config */
+let config;
 
 /**
  * Append an image to the DOM.
@@ -62,14 +65,33 @@ function menuLoadProfile() {
     if (typeof file === 'undefined') {
         return;
     }
+    if (file === null) {
+        return;
+    }
     if (file.length < 1) {
         return;
     }
+    return loadProfile(file[0]);
+}
+
+/**
+ * Actually load the file.
+ *
+ * @param {string} file
+ */
+function loadProfile(file) {
 
     // Load the profile from the given JSON file
-    activeProfile = Stickers.loadFromProfile(file[0]);
+    try {
+        activeProfile = Stickers.loadFromProfile(file);
+    } catch (e) {
+        myConsole.log(e);
+        throw e;
+    }
     $(document).attr('title', activeProfile.getName() + " - Fursona Sticker Switcher");
-    activeProfilePath = file[0];
+    activeProfilePath = file;
+    config.set("lastProfile", activeProfilePath);
+    config.save();
     $('#symlink-path').val(activeProfile.getSymlink());
     redrawImages();
 }
@@ -110,6 +132,8 @@ function menuSaveProfile() {
  * Callback function for the Save Profile menu options.
  */
 function menuSaveFileCallback() {
+    config.set("lastProfile", activeProfilePath);
+    config.save();
     return fs.writeFileSync(
         activeProfilePath,
         JSON.stringify({
@@ -274,14 +298,22 @@ function stickerOnClickEvent() {
 /**
  * Startup functions
  */
-menuNewProfile();
-redrawImages();
-if (process.platform === "win32") {
-    let exec = require('child_process').exec;
-    exec('NET SESSION', function (err, so, se) {
-        isWindowsAdmin = se.length === 0;
+$(document).ready(function() {
+    config = Settings.load('./settings.json');
+    try {
+        loadProfile(config.get('lastProfile'));
+    } catch (e) {
+        myConsole.log(e);
+        menuNewProfile();
+    }
+    redrawImages();
+    if (process.platform === "win32") {
+        let exec = require('child_process').exec;
+        exec('NET SESSION', function (err, so, se) {
+            isWindowsAdmin = se.length === 0;
+        });
+    }
+    $("#symlink-path").on('change', function () {
+        activeProfile.setSymlinkPath($(this).val());
     });
-}
-$("#symlink-path").on('change', function () {
-    activeProfile.setSymlinkPath($(this).val());
 });
