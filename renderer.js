@@ -1,5 +1,6 @@
 /** First, load prerequisites... **/
 const { dialog } = require('electron').remote;
+const changeTime = require('change-file-time');
 const fs = require('fs');
 const ipc = require('electron').ipcRenderer;
 const nodeConsole = require('console');
@@ -7,16 +8,18 @@ const prompt = require('electron-prompt');
 const Stickers = require('./stickers.js');
 
 window.$ = window.jQuery = require('jquery');
-
 let myConsole = new nodeConsole.Console(process.stdout, process.stderr);
 let activeProfile;
 let activeProfilePath;
 let isWindowsAdmin = false;
 
+/**
+ * Append an image to the DOM.
+ *
+ * @param imageObject
+ * @param index
+ */
 function appendImage(imageObject, index = 0) {
-    // Draw an image, with a unique ID and common class.
-    //
-    // An onclick handler will be created to swap images out.
     try {
         $('#sticker-container').append(
             renderImagePreview(imageObject, index)
@@ -27,10 +30,20 @@ function appendImage(imageObject, index = 0) {
     }
 }
 
+/**
+ * Prevent apostrophes from being injected in URLs;
+ *
+ * @param {string} str
+ * @returns {string}
+ */
 function escapeImagePath(str) {
-    return str.split("'").join("");
+    return str.split("'").join("%27");
 }
 
+/**
+ * Called by the main process when the user presses
+ * File > New Profile
+ */
 function menuNewProfile() {
     activeProfile = Stickers.defaultProfile();
     activeProfilePath = "";
@@ -38,6 +51,10 @@ function menuNewProfile() {
     redrawImages();
 }
 
+/**
+ * Called by the main process when the user presses
+ * File > Load Profile
+ */
 function menuLoadProfile() {
     // Open a file dialog
     let file = dialog.showOpenDialog();
@@ -55,6 +72,11 @@ function menuLoadProfile() {
     redrawImages();
 }
 
+
+/**
+ * Called by the main process when the user presses
+ * File > Save Profile
+ */
 function menuSaveProfile() {
     // If path is unspecified, open a file dialog
     // Save the profile to the path specified
@@ -82,6 +104,9 @@ function menuSaveProfile() {
     }
 }
 
+/**
+ * Callback function for the Save Profile menu options.
+ */
 function menuSaveFileCallback() {
     return fs.writeFileSync(
         activeProfilePath,
@@ -94,6 +119,11 @@ function menuSaveFileCallback() {
     );
 }
 
+
+/**
+ * Called by the main process when the user presses
+ * File > Save Profile As
+ */
 function menuSaveProfileAs() {
     // Open a file dialog
     let oldValue = activeProfilePath;
@@ -110,6 +140,12 @@ function menuSaveProfileAs() {
     return menuSaveFileCallback();
     // Save the profile to the path specified
 }
+
+
+/**
+ * Called by the main process when the user presses
+ * File > Add Photo
+ */
 function menuAddPhoto() {
     // Open a file dialog
     let files = dialog.showOpenDialog({"properties": ['multiSelections']});
@@ -129,6 +165,10 @@ function menuAddPhoto() {
     $('.sticker').on('click', stickerOnClickEvent);
 }
 
+
+/**
+ * Clears and redraws all of the images in the active profile.
+ */
 function redrawImages() {
     // Iterate through activeProfile.getImages(), call appendImage()
     document.getElementById('sticker-container').innerHTML = "";
@@ -139,6 +179,13 @@ function redrawImages() {
     $('.sticker').on('click', stickerOnClickEvent);
 }
 
+/**
+ * Return the HTML for rendering an image.
+ *
+ * @param {object} imageObject
+ * @param {int} index
+ * @returns {string}
+ */
 function renderImagePreview(imageObject, index = 0) {
     return "<div class=\"sticker\">" +
         "<img " +
@@ -150,6 +197,11 @@ function renderImagePreview(imageObject, index = 0) {
     "</div>";
 }
 
+/**
+ * Select the image for display on stream.
+ *
+ * @param {string} activeImage
+ */
 function selectImage(activeImage) {
     try {
         // Change symlink to file
@@ -157,19 +209,42 @@ function selectImage(activeImage) {
             fs.unlinkSync(activeProfile.getSymlink());
         }
         if (process.platform === "win32") {
+            /*
+             On Windows, if you don't have permission to create a symlink
+             (i.e. you're not running this as Administrator), we have to
+             delete and copy the file instead. This is much slower, but it
+             serves the same purpose.
+             */
             if (isWindowsAdmin) {
-                return fs.symlinkSync(activeImage, activeProfile.getSymlink());
+                let result = fs.symlinkSync(activeImage, activeProfile.getSymlink());
+                changeTime(activeImage);
+                return result;
             } else {
-                return fs.copyFileSync(activeImage, activeProfile.getSymlink());
+                // Do this asynchronously because it could be slower.
+                return fs.copyFile(
+                    activeImage,
+                    activeProfile.getSymlink(),
+                    function () {
+                        changeTime(activeImage);
+                    }
+                );
             }
         } else {
-            return fs.symlinkSync(activeImage, activeProfile.getSymlink());
+            let result = fs.symlinkSync(activeImage, activeProfile.getSymlink());
+            changeTime(activeImage);
+            return result;
         }
     } catch (e) {
         myConsole.log(e);
     }
 }
 
+/**
+ * Handle menu events from main.js and pass them to their relevant
+ * functions.
+ *
+ * Uses a strict allow list to ensure main.js cannot call arbitrary functions.
+ */
 ipc.on('parentFunc', (event, data) => {
     switch (data) {
         case "menuNewProfile":
@@ -187,13 +262,18 @@ ipc.on('parentFunc', (event, data) => {
     }
 });
 
+/**
+ * OnClick event handler for each sticker.
+ */
 function stickerOnClickEvent() {
     return selectImage($(this).find("img").data("path"));
 }
 
+/**
+ * Startup functions
+ */
 menuNewProfile();
 redrawImages();
-
 if (process.platform === "win32") {
     let exec = require('child_process').exec;
     exec('NET SESSION', function (err, so, se) {

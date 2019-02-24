@@ -33,37 +33,84 @@ class Stickers
         arrayMove.mut(this.images, from, to);
     }
 
+    /**
+     * Get the configuration for a given image.
+     *
+     * @param {int} index
+     * @returns {object}
+     */
     getImage(index) {
         return this.images[index];
     }
 
+    /**
+     * How many images are present in the current profile?
+     *
+     * @returns {number}
+     */
     getImageCount() {
         return this.images.length;
     }
 
+    /**
+     * Returns an array of image objects.
+     *
+     * @returns {object[]}
+     */
     getAllImages() {
         return this.images;
     }
 
+    /**
+     * Returns the name of the current sticker profile.
+     *
+     * @returns {string}
+     */
     getName() {
         return this.name;
     }
 
+    /**
+     * Gets the file path of the current symlink.
+     *
+     * @returns {string}
+     */
     getSymlink() {
         return this.symlink;
     }
 
+    /**
+     * Gets the current version for this profile.
+     *
+     * @returns {number}
+     */
     getVersion() {
         return this.version;
     }
 
+    /**
+     * Sets the name of the current profile.
+     *
+     * @param {string} str
+     */
     setName(str) {
         this.name = str;
     }
+
+    /**
+     * Sets the symlink path.
+     *
+     * @param {string} str
+     */
     setSymlinkPath(str) {
         this.symlink = str;
     }
 
+    /**
+     * Load the default profile.
+     *
+     * @returns {Stickers}
+     */
     static defaultProfile() {
         if (process.platform === "win32") {
             return new Stickers({
@@ -81,10 +128,22 @@ class Stickers
         })
     }
 
+    /**
+     * Load a profile from the filesystem
+     *
+     * @param {string} path
+     * @returns {Stickers}
+     */
     static loadFromProfile(path = "") {
         return new Stickers(JSON.parse(fs.readFileSync(path).toString()));
     }
 
+    /**
+     * Calculate a randomly-generated filename
+     *
+     * @param {number} len
+     * @returns {string}
+     */
     static randomFileName(len = 16) {
         let str = "";
         let chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
