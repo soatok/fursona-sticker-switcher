@@ -47,6 +47,7 @@ function escapeImagePath(str) {
 function menuNewProfile() {
     activeProfile = Stickers.defaultProfile();
     activeProfilePath = "";
+    $(document).attr('title', 'New Profile' + " - Fursona Sticker Switcher");
     $('#symlink-path').val(activeProfile.getSymlink());
     redrawImages();
 }
@@ -67,11 +68,11 @@ function menuLoadProfile() {
 
     // Load the profile from the given JSON file
     activeProfile = Stickers.loadFromProfile(file[0]);
+    $(document).attr('title', activeProfile.getName() + " - Fursona Sticker Switcher");
     activeProfilePath = file[0];
     $('#symlink-path').val(activeProfile.getSymlink());
     redrawImages();
 }
-
 
 /**
  * Called by the main process when the user presses
@@ -88,6 +89,7 @@ function menuSaveProfile() {
         }).then(function (r) {
             try {
                 activeProfile.setName(r);
+                $(document).attr('title', r + " - Fursona Sticker Switcher");
                 if (activeProfilePath === "") {
                     return menuSaveProfileAs();
                 }
