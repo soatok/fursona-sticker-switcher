@@ -6,15 +6,18 @@ const ipc = require('electron').ipcRenderer;
 const nodeConsole = require('console');
 const prompt = require('electron-prompt');
 const Settings = require('./settings');
+const { Sortable } = require('@shopify/draggable');
 const Stickers = require('./stickers.js');
 
 window.$ = window.jQuery = require('jquery');
 let myConsole = new nodeConsole.Console(process.stdout, process.stderr);
 let activeProfile;
 let activeProfilePath;
+let dragFrom, dragOver;
 let isWindowsAdmin = false;
 /** @var {Settings} config */
 let config;
+let dragDrop;
 
 /**
  * Append an image to the DOM.
@@ -42,8 +45,6 @@ function detectActiveSymlink() {
     let link = activeProfile.getSymlink();
     if (fs.existsSync(link)) {
         let realpath = fs.realpathSync(link);
-        myConsole.log("Test:");
-        myConsole.log(JSON.stringify(realpath));
         if (realpath.length > 0) {
             let len = activeProfile.getImageCount();
             let img;
@@ -58,6 +59,37 @@ function detectActiveSymlink() {
         }
     }
     $('#transparent-sticker').addClass('active');
+}
+
+/**
+ * @param {DragStartEvent} event
+ */
+function dragStartEvent(event) {
+    let id = event.data.source.getAttribute('id');
+    dragFrom = $("#"+id+" img").data('index');
+}
+
+/**
+ * @param {DragOverEvent} event
+ */
+function dragOverEvent(event) {
+    let id = event.over.getAttribute('id');
+    let temp = $("#"+id+" img").data('index');
+    if (temp !== dragFrom) {
+        dragOver = temp;
+    }
+}
+
+/**
+ * @param {DragStopEvent} event
+ */
+function dragStopEvent(event) {
+    if (dragOver < 0) {
+        return;
+    }
+    // myConsole.log({"from": dragFrom, "to": dragOver});
+    activeProfile.moveImage(dragFrom, dragOver);
+    setTimeout(redrawImages, 1);
 }
 
 /**
@@ -240,7 +272,7 @@ function redrawImages() {
 }
 
 function renderTransparentImage() {
-    return "<div class=\"sticker\">" +
+    return "<div class=\"sticker\" id=\"transparent-sticker-container\">" +
         "<img " +
             "id='transparent-sticker' " +
             "class='transparent' " +
@@ -260,9 +292,10 @@ function renderTransparentImage() {
  * @returns {string}
  */
 function renderImagePreview(imageObject, index = 0) {
-    return "<div class=\"sticker\">" +
+    return "<div class=\"sticker draggable-source\" id=\"image-" + index + "-container\">" +
         "<img " +
             "id='image-" + index + "' " +
+            "title='image-" + index + "' " +
             "alt='Click to choose sticker' " +
             "data-index='" + index + "' " +
             "data-path='" + escapeImagePath(imageObject.path) + "' " +
@@ -372,4 +405,10 @@ $(document).ready(function() {
     $("#symlink-path").on('change', function () {
         activeProfile.setSymlinkPath($(this).val());
     });
+    dragDrop = new Sortable(
+        document.getElementById('sticker-container')
+    );
+    dragDrop.on('drag:start', dragStartEvent);
+    dragDrop.on('drag:over', dragOverEvent);
+    dragDrop.on('drag:stop', dragStopEvent);
 });
