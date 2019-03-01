@@ -1,4 +1,6 @@
 /** First, load prerequisites... **/
+const { remote } = require('electron');
+const { Menu, MenuItem } = remote;
 const { dialog } = require('electron').remote;
 const changeTime = require('change-file-time');
 const fs = require('fs');
@@ -13,6 +15,7 @@ window.$ = window.jQuery = require('jquery');
 let myConsole = new nodeConsole.Console(process.stdout, process.stderr);
 let activeProfile;
 let activeProfilePath;
+let contextMenuTarget;
 let dragFrom, dragOver;
 let isWindowsAdmin = false;
 /** @var {Settings} config */
@@ -34,6 +37,23 @@ function appendImage(imageObject, index = 0) {
     } catch (e) {
         myConsole.log(e);
     }
+}
+
+/**
+ * Delete a sticker from the pack.
+ */
+function contextMenuRemove() {
+    let id = contextMenuTarget.getAttribute('id');
+    let index = -1;
+    if (id.match(/^image\-[0-9]+$/)) {
+        index = $("#" + id).data('index');
+    } else if (id.match(/^image\-[0-9]+\-container$/)) {
+        index = $("#" + id + " img").data('index');
+    } else {
+        return;
+    }
+    activeProfile.removeSticker(index);
+    setTimeout(redrawImages, 1);
 }
 
 /**
@@ -411,4 +431,27 @@ $(document).ready(function() {
     dragDrop.on('drag:start', dragStartEvent);
     dragDrop.on('drag:over', dragOverEvent);
     dragDrop.on('drag:stop', dragStopEvent);
+
+    const imageMenu = new Menu();
+    imageMenu.append(
+        new MenuItem(
+            {
+                label: 'Remove Sticker',
+                click() {
+                    return contextMenuRemove();
+                }
+            }
+        )
+    );
+    document
+        .getElementById('sticker-container')
+        .addEventListener(
+            'contextmenu',
+            (e) => {
+                contextMenuTarget = e.target;
+                e.preventDefault();
+                imageMenu.popup({window: remote.getCurrentWindow()})
+            },
+            false
+    );
 });

@@ -88,6 +88,10 @@ class Stickers
         return this.version;
     }
 
+    removeSticker(index) {
+        this.images.splice(index, 1);
+    }
+
     /**
      * Sets the name of the current profile.
      *
