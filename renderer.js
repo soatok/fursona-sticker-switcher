@@ -107,6 +107,9 @@ function dragStopEvent(event) {
     if (dragOver < 0) {
         return;
     }
+    if (dragOver === dragFrom) {
+        return;
+    }
     // myConsole.log({"from": dragFrom, "to": dragOver});
     activeProfile.moveImage(dragFrom, dragOver);
     ipc.send('unsaved-changes', true);
@@ -465,11 +468,13 @@ $(document).ready(function() {
     };
 
     document.body.ondrop = (ev) => {
-        let newImage = {"path": ev.dataTransfer.files[0].path};
-        let newIndex = activeProfile.getImageCount();
-        myConsole.log(newIndex);
-        activeProfile.appendImage(newImage);
-        appendImage(newImage, newIndex);
+        let newImage, newIndex;
+        newIndex = activeProfile.getImageCount();
+        for (let i = 0; i < ev.dataTransfer.files.length; i++) {
+            newImage = {"path": ev.dataTransfer.files[i].path};
+            activeProfile.appendImage(newImage);
+            appendImage(newImage, (newIndex + i));
+        }
         // redrawImages();
     };
 });
