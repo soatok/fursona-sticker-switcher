@@ -23,7 +23,25 @@ First, clone our repository using git. Then, run `npm install --save`.
 
 ### Windows
 
+Extract the ZIP folder to a directory somewhere on your computer.
+
 Run `electron.exe`.
+
+For better performance, right click and select **Run as Administrator.**
+
+### Linux
+
+Extract the ZIP folder to a directory somewhere on your computer.
+
+Run the `electron` binary.
+
+### Mac OS X
+
+Extract the ZIP folder to a directory somewhere on your computer.
+
+Run `Electron.app`.
+
+### Once The App is Running
 
 ![App Screenshot](docs/img/fursona-stickers-00.png)
 
@@ -33,13 +51,15 @@ software.
  
 You may edit this field if you have a specific file destination in mind.
 
-Now go to File > Add Image to add your stickers.
+Now go to File > Add Image to add your stickers. You may also drag and drop
+images from Windows Explorer.
 
 Once you click on the sticker, it should update in your streaming software.
 
-### Other Operating Systems
+To remove a sticker, right click and select "Remove Sticker".
 
-Coming soon!
+To rearrange stickers, simply drag and drop them withing the application
+window.
 
 ## Caveats with Animated GIFs and Streamlabs OBS
 
