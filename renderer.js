@@ -459,4 +459,17 @@ $(document).ready(function() {
             },
             false
         );
+
+    document.ondragover = document.ondrop = (ev) => {
+        ev.preventDefault();
+    };
+
+    document.body.ondrop = (ev) => {
+        let newImage = {"path": ev.dataTransfer.files[0].path};
+        let newIndex = activeProfile.getImageCount();
+        myConsole.log(newIndex);
+        activeProfile.appendImage(newImage);
+        appendImage(newImage, newIndex);
+        // redrawImages();
+    };
 });
