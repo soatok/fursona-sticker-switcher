@@ -11,6 +11,7 @@ const Settings = require('./settings');
 const { Sortable } = require('@shopify/draggable');
 const Stickers = require('./stickers.js');
 
+/** Initialize some variables to be used throughout the lifetime of the app: */
 window.$ = window.jQuery = require('jquery');
 let myConsole = new nodeConsole.Console(process.stdout, process.stderr);
 let activeProfile;
@@ -299,15 +300,20 @@ function redrawImages() {
     $('.sticker').on('click', stickerOnClickEvent);
 }
 
+/**
+ * The transparent image is special.
+ *
+ * @returns {string}
+ */
 function renderTransparentImage() {
     return "<div class=\"sticker\" id=\"transparent-sticker-container\">" +
         "<img " +
-        "id='transparent-sticker' " +
-        "class='transparent' " +
-        "alt='Click to not choose a sticker' " +
-        "data-index='-1' " +
-        "data-path='' " +
-        "src='transparent.png' " +
+            "id='transparent-sticker' " +
+            "class='transparent' " +
+            "alt='Click to not choose a sticker' " +
+            "data-index='-1' " +
+            "data-path='' " +
+            "src='transparent.png' " +
         "/>" +
         "</div>";
 }
@@ -322,12 +328,12 @@ function renderTransparentImage() {
 function renderImagePreview(imageObject, index = 0) {
     return "<div class=\"sticker draggable-source\" id=\"image-" + index + "-container\">" +
         "<img " +
-        "id='image-" + index + "' " +
-        "title='image-" + index + "' " +
-        "alt='Click to choose sticker' " +
-        "data-index='" + index + "' " +
-        "data-path='" + escapeImagePath(imageObject.path) + "' " +
-        "src='file://" + escapeImagePath(imageObject.path) + "' " +
+            "id='image-" + index + "' " +
+            "title='image-" + index + "' " +
+            "alt='Click to choose sticker' " +
+            "data-index='" + index + "' " +
+            "data-path='" + escapeImagePath(imageObject.path) + "' " +
+            "src='file://" + escapeImagePath(imageObject.path) + "' " +
         "/>" +
         "</div>";
 }
@@ -451,6 +457,10 @@ $(document).ready(function() {
             }
         )
     );
+
+    /**
+     * Attaches the right menu to #sticker-container.
+     */
     document
         .getElementById('sticker-container')
         .addEventListener(
@@ -463,10 +473,18 @@ $(document).ready(function() {
             false
         );
 
+    /**
+     * Prevent the default behavior.
+     */
     document.ondragover = document.ondrop = (ev) => {
         ev.preventDefault();
     };
 
+    /**
+     * The ondrop handler allows us to add image files when they are
+     * dragged and dropped from outside the app. In our case, we simply
+     * iterate through them and add them to the current profile.
+     */
     document.body.ondrop = (ev) => {
         let newImage, newIndex;
         newIndex = activeProfile.getImageCount();
@@ -475,6 +493,5 @@ $(document).ready(function() {
             activeProfile.appendImage(newImage);
             appendImage(newImage, (newIndex + i));
         }
-        // redrawImages();
     };
 });
