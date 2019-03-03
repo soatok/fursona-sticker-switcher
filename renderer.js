@@ -1,4 +1,6 @@
 /** First, load prerequisites... **/
+const { remote } = require('electron');
+const { Menu, MenuItem } = remote;
 const { dialog } = require('electron').remote;
 const changeTime = require('change-file-time');
 const fs = require('fs');
@@ -6,15 +8,19 @@ const ipc = require('electron').ipcRenderer;
 const nodeConsole = require('console');
 const prompt = require('electron-prompt');
 const Settings = require('./settings');
+const { Sortable } = require('@shopify/draggable');
 const Stickers = require('./stickers.js');
 
 window.$ = window.jQuery = require('jquery');
 let myConsole = new nodeConsole.Console(process.stdout, process.stderr);
 let activeProfile;
 let activeProfilePath;
+let contextMenuTarget;
+let dragFrom, dragOver;
 let isWindowsAdmin = false;
 /** @var {Settings} config */
 let config;
+let dragDrop;
 
 /**
  * Append an image to the DOM.
@@ -34,6 +40,23 @@ function appendImage(imageObject, index = 0) {
 }
 
 /**
+ * Delete a sticker from the pack.
+ */
+function contextMenuRemove() {
+    let id = contextMenuTarget.getAttribute('id');
+    let index = -1;
+    if (id.match(/^image\-[0-9]+$/)) {
+        index = $("#" + id).data('index');
+    } else if (id.match(/^image\-[0-9]+\-container$/)) {
+        index = $("#" + id + " img").data('index');
+    } else {
+        return;
+    }
+    activeProfile.removeSticker(index);
+    setTimeout(redrawImages, 1);
+}
+
+/**
  * Detect which sticker is the target of the symlink, mark it as active.
  *
  * Otherwise, mark the transparent space as active.
@@ -42,8 +65,6 @@ function detectActiveSymlink() {
     let link = activeProfile.getSymlink();
     if (fs.existsSync(link)) {
         let realpath = fs.realpathSync(link);
-        myConsole.log("Test:");
-        myConsole.log(JSON.stringify(realpath));
         if (realpath.length > 0) {
             let len = activeProfile.getImageCount();
             let img;
@@ -58,6 +79,38 @@ function detectActiveSymlink() {
         }
     }
     $('#transparent-sticker').addClass('active');
+}
+
+/**
+ * @param {DragStartEvent} event
+ */
+function dragStartEvent(event) {
+    let id = event.data.source.getAttribute('id');
+    dragFrom = $("#"+id+" img").data('index');
+}
+
+/**
+ * @param {DragOverEvent} event
+ */
+function dragOverEvent(event) {
+    let id = event.over.getAttribute('id');
+    let temp = $("#"+id+" img").data('index');
+    if (temp !== dragFrom) {
+        dragOver = temp;
+    }
+}
+
+/**
+ * @param {DragStopEvent} event
+ */
+function dragStopEvent(event) {
+    if (dragOver < 0) {
+        return;
+    }
+    // myConsole.log({"from": dragFrom, "to": dragOver});
+    activeProfile.moveImage(dragFrom, dragOver);
+    ipc.send('unsaved-changes', true);
+    setTimeout(redrawImages, 1);
 }
 
 /**
@@ -84,6 +137,7 @@ function menuNewProfile() {
         $('.active').removeClass('active');
         $('#transparent-sticker').addClass('active');
     }, 1);
+    ipc.send('unsaved-changes', true);
 }
 
 /**
@@ -125,6 +179,7 @@ function loadProfile(file) {
     config.save();
     $('#symlink-path').val(activeProfile.getSymlink());
     redrawImages();
+    ipc.send('unsaved-changes', false);
     setTimeout(detectActiveSymlink, 1);
 }
 
@@ -166,6 +221,7 @@ function menuSaveProfile() {
 function menuSaveFileCallback() {
     config.set("lastProfile", activeProfilePath);
     config.save();
+    ipc.send('unsaved-changes', false);
     return fs.writeFileSync(
         activeProfilePath,
         JSON.stringify({
@@ -221,6 +277,7 @@ function menuAddPhoto() {
         appendImage(newImage, i);
     }
     $('.sticker').on('click', stickerOnClickEvent);
+    ipc.send('unsaved-changes', true);
 }
 
 
@@ -240,16 +297,16 @@ function redrawImages() {
 }
 
 function renderTransparentImage() {
-    return "<div class=\"sticker\">" +
+    return "<div class=\"sticker\" id=\"transparent-sticker-container\">" +
         "<img " +
-            "id='transparent-sticker' " +
-            "class='transparent' " +
-            "alt='Click to not choose a sticker' " +
-            "data-index='-1' " +
-            "data-path='' " +
-            "src='transparent.png' " +
+        "id='transparent-sticker' " +
+        "class='transparent' " +
+        "alt='Click to not choose a sticker' " +
+        "data-index='-1' " +
+        "data-path='' " +
+        "src='transparent.png' " +
         "/>" +
-    "</div>";
+        "</div>";
 }
 
 /**
@@ -260,15 +317,16 @@ function renderTransparentImage() {
  * @returns {string}
  */
 function renderImagePreview(imageObject, index = 0) {
-    return "<div class=\"sticker\">" +
+    return "<div class=\"sticker draggable-source\" id=\"image-" + index + "-container\">" +
         "<img " +
-            "id='image-" + index + "' " +
-            "alt='Click to choose sticker' " +
-            "data-index='" + index + "' " +
-            "data-path='" + escapeImagePath(imageObject.path) + "' " +
-            "src='file://" + escapeImagePath(imageObject.path) + "' " +
+        "id='image-" + index + "' " +
+        "title='image-" + index + "' " +
+        "alt='Click to choose sticker' " +
+        "data-index='" + index + "' " +
+        "data-path='" + escapeImagePath(imageObject.path) + "' " +
+        "src='file://" + escapeImagePath(imageObject.path) + "' " +
         "/>" +
-    "</div>";
+        "</div>";
 }
 
 /**
@@ -372,4 +430,33 @@ $(document).ready(function() {
     $("#symlink-path").on('change', function () {
         activeProfile.setSymlinkPath($(this).val());
     });
+    dragDrop = new Sortable(
+        document.getElementById('sticker-container')
+    );
+    dragDrop.on('drag:start', dragStartEvent);
+    dragDrop.on('drag:over', dragOverEvent);
+    dragDrop.on('drag:stop', dragStopEvent);
+
+    const imageMenu = new Menu();
+    imageMenu.append(
+        new MenuItem(
+            {
+                label: 'Remove Sticker',
+                click() {
+                    return contextMenuRemove();
+                }
+            }
+        )
+    );
+    document
+        .getElementById('sticker-container')
+        .addEventListener(
+            'contextmenu',
+            (e) => {
+                contextMenuTarget = e.target;
+                e.preventDefault();
+                imageMenu.popup({window: remote.getCurrentWindow()})
+            },
+            false
+        );
 });
