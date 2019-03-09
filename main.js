@@ -147,6 +147,7 @@ function downloadTelegramSticker(stickerID, saveDir) {
     if (fs.existsSync(saveDir + "/" + stickerID + ".png")) {
         telegramPending--;
         if (telegramPending < 1) {
+            mainWindow.webContents.send('import-complete', true);
             telegramImportWindow.webContents.send('import-complete', true);
         }
         return mainWindow.webContents.send(
@@ -165,6 +166,7 @@ function downloadTelegramSticker(stickerID, saveDir) {
         );
         telegramPending--;
         if (telegramPending < 1) {
+            mainWindow.webContents.send('import-complete', true);
             telegramImportWindow.webContents.send('import-complete', true);
         }
     });

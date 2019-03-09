@@ -425,6 +425,9 @@ ipc.on('parentFunc', (event, data) => {
             throw new Error("Function not allowed");
     }
 });
+ipc.on('import-complete', (event, data) => {
+    setTimeout(redrawImages, 1);
+});
 
 ipc.on('telegram-imported-sticker', (event, data) => {
     let newIndex = activeProfile.getImageCount();
