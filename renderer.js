@@ -96,6 +96,9 @@ function dragStartEvent(event) {
 function dragOverEvent(event) {
     let id = event.over.getAttribute('id');
     let temp = $("#"+id+" img").data('index');
+    if (event.mirror.getAttribute('id') === id) {
+        return;
+    }
     if (temp !== dragFrom) {
         dragOver = temp;
     }
