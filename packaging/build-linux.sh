@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-PREBUILT="https://github.com/electron/electron/releases/download/v4.0.6/electron-v4.0.6-linux-x64.zip"
-VERSION="v0.2.1"
+PREBUILT="https://github.com/electron/electron/releases/download/v4.0.8/electron-v4.0.8-linux-x64.zip"
+VERSION="v0.3.0"
 
 mkdir build-linux
 cd build-linux
