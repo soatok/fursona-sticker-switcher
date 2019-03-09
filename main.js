@@ -5,7 +5,9 @@ const {app, BrowserWindow, dialog, ipcMain, Menu, MenuItem} = require('electron'
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
+let telegramImportWindow;
 let haveUnsavedChanges;
+let telegramWindowOpen = false;
 
 function callFunctionInWindow(name) {
     return mainWindow.webContents.send('parentFunc', name);
@@ -87,12 +89,29 @@ function createIndexMenu() {
  * Show Telegram import window if it's not already open.
  */
 function showTelegramImportWindow() {
+    if (telegramWindowOpen) {
+        return;
+    }
+    telegramImportWindow = new BrowserWindow({
+        minWidth: 350,
+        minHeight: 130,
+        width: 360,
+        height: 140
+    });
 
+    telegramImportWindow.loadFile('import-telegram.html');
+    telegramImportWindow.on('closed', function() {
+        telegramWindowOpen = false;
+        telegramImportWindow = null;
+    });
+    telegramWindowOpen = true;
 }
 
 function createWindow () {
     // Create the browser window.
     mainWindow = new BrowserWindow({
+        minWidth: 280,
+        minHeight: 220,
         width: 810,
         height: 600
     });
@@ -129,7 +148,10 @@ function createWindow () {
         // Dereference the window object, usually you would store windows
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.
-        mainWindow = null
+        mainWindow = null;
+        if (typeof telegramImportWindow === "object") {
+            telegramImportWindow.close();
+        }
     });
 
     ipcMain.on('unsaved-changes', (event, arg) => {

@@ -62,3 +62,6 @@ body {
 #sticker-container {
     outline: none;
 }
+.text-right {
+    text-align: right;
+}
