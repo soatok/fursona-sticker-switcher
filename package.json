@@ -1,6 +1,6 @@
 {
   "name": "fursona-sticker-switcher",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "Dynamic image swapping for furry live-streamers. (Character stills, Telegram stickers, etc.)",
   "main": "main.js",
   "scripts": {
