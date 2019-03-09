@@ -61,6 +61,18 @@ To remove a sticker, right click and select "Remove Sticker".
 To rearrange stickers, simply drag and drop them withing the application
 window.
 
+#### Telegram Sticker Pack Import
+
+From your Telegram app, click the "Share" button for your desired
+sticker pack. This will copy the URL to your clipboard.
+
+In our app, go to File > Import > Telegram.
+
+You may also change the destination directory that stickers will be
+saved to from this window.
+
+Paste the URL in the Sticker URL field in the window. Press Import.
+
 ## Caveats with Animated GIFs and Streamlabs OBS
 
 If you append `.gif` to the Image Source file path, you can use GIFs (but

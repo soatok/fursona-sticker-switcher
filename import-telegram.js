@@ -1,5 +1,6 @@
 /** First, load prerequisites... **/
 const remote = require('electron').remote;
+const fs = require('fs');
 const ipc = require('electron').ipcRenderer;
 const Settings = require('./settings');
 const nodeConsole = require('console');
@@ -68,12 +69,15 @@ $(document).ready(function() {
 
     if (typeof(lastDirectory) !== "string") {
         if (process.platform === "win32") {
-            lastDirectory = process.env.USERPROFILE;
+            lastDirectory = process.env.USERPROFILE + "\\Downloads\\Sticker Switcher";
         } else {
-            lastDirectory = process.env.HOME;
+            lastDirectory = process.env.HOME + "/Downloads/Sticker Switcher";
         }
         config.set('telegramStickerDir', lastDirectory);
         config.save();
+    }
+    if (!fs.existsSync(lastDirectory)) {
+        fs.mkdir(lastDirectory);
     }
 
     if (lastDirectory.length > 0) {
