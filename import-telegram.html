@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="./style.css" type="text/css" />
 </head>
 <body>
+<div id="container">
     <table>
         <tr>
             <td class="text-right">
@@ -20,7 +21,8 @@
                 <label for="folder">Folder:</label>
             </td>
             <td>
-                <input type="file" webkitdirectory name="folder" id="folder" />
+                <div id="current-folder"></div>
+                <input type="file" name="folder" id="folder" webkitdirectory />
             </td>
         </tr>
         <tr>
@@ -32,6 +34,7 @@
             </td>
         </tr>
     </table>
+</div>
 <script>
     const nodeConsole = require('console');
     let myConsole = new nodeConsole.Console(process.stdout, process.stderr);
