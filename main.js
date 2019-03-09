@@ -14,6 +14,7 @@ function callFunctionInWindow(name) {
 function createIndexMenu() {
     const indexMenu = new Menu();
     const FileSubMenu = new Menu();
+    const FileImportSubMenu = new Menu();
     FileSubMenu.append(
         new MenuItem({
             "label": "New Profile",
@@ -54,6 +55,24 @@ function createIndexMenu() {
             }
         })
     );
+    FileImportSubMenu.append(
+        new MenuItem({
+            "label": "Telegram",
+            click() {
+                return showTelegramImportWindow();
+            }
+        })
+    );
+
+    FileSubMenu.append(
+        new MenuItem({
+            "label": "Import",
+            "submenu": FileImportSubMenu,
+            click() {
+                return callFunctionInWindow('menuAddPhoto');
+            }
+        })
+    );
 
     indexMenu.append(
         new MenuItem({
@@ -62,6 +81,13 @@ function createIndexMenu() {
         })
     );
     return indexMenu
+}
+
+/**
+ * Show Telegram import window if it's not already open.
+ */
+function showTelegramImportWindow() {
+
 }
 
 function createWindow () {
