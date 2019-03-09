@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Fursona Sticker Switcher</title>
+    <link rel="stylesheet" href="./style.css" type="text/css" />
+</head>
+<body>
+<div id="container">
+    <table>
+        <tr>
+            <td class="text-right">
+                <label for="sticker-url">Sticker URL:</label>
+            </td>
+            <td>
+                <input type="text" name="sticker-url" id="sticker-url" />
+            </td>
+        </tr>
+        <tr>
+            <td class="text-right">
+                <label for="folder">Folder:</label>
+            </td>
+            <td>
+                <div id="current-folder"></div>
+                <input type="file" name="folder" id="folder" webkitdirectory />
+            </td>
+        </tr>
+        <tr>
+            <td class="text-right">
+                <button id="import-btn">Import</button>
+            </td>
+            <td>
+                <button id="cancel-btn">Cancel</button>
+            </td>
+        </tr>
+    </table>
+</div>
+<script>
+    const nodeConsole = require('console');
+    let myConsole = new nodeConsole.Console(process.stdout, process.stderr);
+    try {
+        require('./import-telegram.js');
+    } catch (e) {
+        myConsole.log(e);
+    }</script>
+</body>
+</html>

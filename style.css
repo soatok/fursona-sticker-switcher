@@ -62,3 +62,12 @@ body {
 #sticker-container {
     outline: none;
 }
+.text-right {
+    text-align: right;
+}
+#current-folder {
+    min-height: 1rem;
+}
+.error-input {
+    box-shadow: #f00 0 0 1px;
+}

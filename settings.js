@@ -34,7 +34,8 @@ class Settings
             );
         } catch (e) {
             return new Settings({
-                "lastProfile": null
+                "lastProfile": null,
+                "telegramStickerDir": null
             });
         }
     }

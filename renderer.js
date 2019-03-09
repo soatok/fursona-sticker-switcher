@@ -426,6 +426,13 @@ ipc.on('parentFunc', (event, data) => {
     }
 });
 
+ipc.on('telegram-imported-sticker', (event, data) => {
+    let newIndex = activeProfile.getImageCount();
+    activeProfile.appendImage({"path": data});
+    ipc.send('unsaved-changes', true);
+    appendImage({"path": data}, newIndex);
+});
+
 /**
  * Startup functions
  */

@@ -1,11 +1,20 @@
 // Modules to control application life and create native browser window
 const {app, BrowserWindow, dialog, ipcMain, Menu, MenuItem} = require('electron');
+const fs = require('fs');
+const async = require('async');
+const request = require('request');
 
+const APP_CONFIG = {
+    "STICKER_URL": "http://localhost:3000"
+};
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
+let telegramImportWindow;
 let haveUnsavedChanges;
+let telegramWindowOpen = false;
+let telegramPending = 0;
 
 function callFunctionInWindow(name) {
     return mainWindow.webContents.send('parentFunc', name);
@@ -14,10 +23,14 @@ function callFunctionInWindow(name) {
 function createIndexMenu() {
     const indexMenu = new Menu();
     const FileSubMenu = new Menu();
+    const FileImportSubMenu = new Menu();
     FileSubMenu.append(
         new MenuItem({
             "label": "New Profile",
             click() {
+                if (telegramWindowOpen) {
+                    telegramImportWindow.close();
+                }
                 return callFunctionInWindow('menuNewProfile');
             }
         })
@@ -26,6 +39,9 @@ function createIndexMenu() {
         new MenuItem({
             "label": "Load Profile",
             click() {
+                if (telegramWindowOpen) {
+                    telegramImportWindow.close();
+                }
                 return callFunctionInWindow('menuLoadProfile');
             }
         })
@@ -54,6 +70,24 @@ function createIndexMenu() {
             }
         })
     );
+    FileImportSubMenu.append(
+        new MenuItem({
+            "label": "Telegram",
+            click() {
+                return showTelegramImportWindow();
+            }
+        })
+    );
+
+    FileSubMenu.append(
+        new MenuItem({
+            "label": "Import",
+            "submenu": FileImportSubMenu,
+            click() {
+                return callFunctionInWindow('menuAddPhoto');
+            }
+        })
+    );
 
     indexMenu.append(
         new MenuItem({
@@ -64,9 +98,115 @@ function createIndexMenu() {
     return indexMenu
 }
 
+/**
+ * Import stickers from a Telegram sticker set.
+ *
+ * 1. Fetch the JSON for that sticker. Handle errors, etc.
+ * 2. Iterate and download all stickers.
+ * 3. Assemble an array of absolute file paths.
+ * 4. Pass it along through IPC to main window.
+ *
+ * @param {object} arg
+ */
+function doTelegramImport(arg)
+{
+    let sticker = arg['sticker'];
+    let saveTo = arg['saveTo'];
+
+    request(
+        APP_CONFIG["STICKER_URL"] + "/pack/" + sticker,
+        function (err, resp, body) {
+            if (typeof(resp.statusCode) === "undefined") {
+                console.log("No status code defined");
+                return;
+            }
+            if (resp.statusCode !== 200) {
+                console.log("Error getting sticker pack metadata");
+                return;
+            }
+            let parsed = JSON.parse(body);
+            telegramPending = 0;
+            // .forEachOf(obj, (value, key, callback) => {
+            async.forEachOf(parsed.stickers, (sticker, key, callback) => {
+                telegramPending++;
+                downloadTelegramSticker(sticker.id, saveTo);
+            });
+        }
+    );
+}
+
+/**
+ * Download a Telegram sticker and save it to the destination directory.
+ *
+ * @param {string} stickerID
+ * @param {string} saveDir
+ */
+function downloadTelegramSticker(stickerID, saveDir) {
+    /* Don't download it if it's already local. */
+    if (fs.existsSync(saveDir + "/" + stickerID + ".png")) {
+        console.log({"cached": saveDir + "/" + stickerID + ".png"});
+        return mainWindow.webContents.send(
+            "telegram-imported-sticker",
+            saveDir + "/" + stickerID + ".png"
+        );
+    }
+    /* Fetch it. */
+
+    let stream = fs.createWriteStream(saveDir + "/" + stickerID + ".png");
+
+    console.log({
+        "begin": saveDir + "/" + stickerID + ".png",
+        "url": APP_CONFIG["STICKER_URL"] + "/sticker/" + stickerID + ".png"
+    });
+
+    return request.get(APP_CONFIG["STICKER_URL"] + "/sticker/" + stickerID + ".png")
+        .on('error', function(err) {
+            console.log(err)
+        })
+        .on('end', function() {
+            console.log({"end": saveDir + "/" + stickerID + ".png"});
+            console.log(saveDir + "/" + stickerID + ".png");
+            mainWindow.webContents.send(
+                "telegram-imported-sticker",
+                saveDir + "/" + stickerID + ".png"
+            );
+            telegramPending--;
+            if (telegramPending < 1) {
+                telegramImportWindow.webContents.send('import-complete', true);
+            }
+        })
+        .pipe(stream);
+}
+
+/**
+ * Show Telegram import window if it's not already open.
+ */
+function showTelegramImportWindow() {
+    if (telegramWindowOpen) {
+        return;
+    }
+    telegramImportWindow = new BrowserWindow({
+        minWidth: 350,
+        minHeight: 150,
+        width: 360,
+        height: 160
+    });
+    telegramImportWindow.setMenuBarVisibility(false);
+    telegramImportWindow.setMenu(null);
+
+    telegramImportWindow.loadFile('import-telegram.html');
+    telegramImportWindow.on('closed', function() {
+        telegramWindowOpen = false;
+        telegramImportWindow = null;
+    });
+    telegramWindowOpen = true;
+}
+
 function createWindow () {
     // Create the browser window.
     mainWindow = new BrowserWindow({
+        minWidth: 280,
+        minHeight: 220,
         width: 810,
         height: 600
     });
@@ -103,7 +243,14 @@ function createWindow () {
         // Dereference the window object, usually you would store windows
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.
-        mainWindow = null
+        mainWindow = null;
+        if (telegramWindowOpen) {
+            telegramImportWindow.close();
+        }
+    });
+
+    ipcMain.on('telegram-import', (event, arg) => {
+        doTelegramImport(arg);
     });
 
     ipcMain.on('unsaved-changes', (event, arg) => {
