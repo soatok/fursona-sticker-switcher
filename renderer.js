@@ -105,15 +105,20 @@ function dragOverEvent(event) {
  * @param {DragStopEvent} event
  */
 function dragStopEvent(event) {
+    if (typeof dragOver === 'undefined') {
+        return;
+    }
     if (dragOver < 0) {
         return;
     }
     if (dragOver === dragFrom) {
         return;
     }
-    // myConsole.log({"from": dragFrom, "to": dragOver});
+    myConsole.log({"from": dragFrom, "to": dragOver});
     activeProfile.moveImage(dragFrom, dragOver);
     ipc.send('unsaved-changes', true);
+    dragOver = -1;
+    dragFrom = -1;
     setTimeout(redrawImages, 1);
 }
 
