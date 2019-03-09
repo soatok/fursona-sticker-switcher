@@ -144,7 +144,10 @@ function doTelegramImport(arg)
 function downloadTelegramSticker(stickerID, saveDir) {
     /* Don't download it if it's already local. */
     if (fs.existsSync(saveDir + "/" + stickerID + ".png")) {
-        console.log({"cached": saveDir + "/" + stickerID + ".png"});
+        telegramPending--;
+        if (telegramPending < 1) {
+            telegramImportWindow.webContents.send('import-complete', true);
+        }
         return mainWindow.webContents.send(
             "telegram-imported-sticker",
             saveDir + "/" + stickerID + ".png"
@@ -153,19 +156,11 @@ function downloadTelegramSticker(stickerID, saveDir) {
     /* Fetch it. */
 
     let stream = fs.createWriteStream(saveDir + "/" + stickerID + ".png");
-
-    console.log({
-        "begin": saveDir + "/" + stickerID + ".png",
-        "url": APP_CONFIG["STICKER_URL"] + "/sticker/" + stickerID + ".png"
-    });
-
     return request.get(APP_CONFIG["STICKER_URL"] + "/sticker/" + stickerID + ".png")
         .on('error', function(err) {
             console.log(err)
         })
         .on('end', function() {
-            console.log({"end": saveDir + "/" + stickerID + ".png"});
-            console.log(saveDir + "/" + stickerID + ".png");
             mainWindow.webContents.send(
                 "telegram-imported-sticker",
                 saveDir + "/" + stickerID + ".png"
