@@ -6,7 +6,7 @@ const request = require('request');
 const download = require('images-downloader').images;
 
 const APP_CONFIG = {
-    "STICKER_URL": "http://localhost:3000"
+    "STICKER_URL": "https://stickers.soatok.com"
 };
 
 // Keep a global reference of the window object, if you don't, the window will
