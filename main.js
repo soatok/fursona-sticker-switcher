@@ -3,6 +3,7 @@ const {app, BrowserWindow, dialog, ipcMain, Menu, MenuItem} = require('electron'
 const fs = require('fs');
 const async = require('async');
 const request = require('request');
+const download = require('images-downloader').images;
 
 const APP_CONFIG = {
     "STICKER_URL": "http://localhost:3000"
@@ -154,23 +155,19 @@ function downloadTelegramSticker(stickerID, saveDir) {
         );
     }
     /* Fetch it. */
-
-    let stream = fs.createWriteStream(saveDir + "/" + stickerID + ".png");
-    return request.get(APP_CONFIG["STICKER_URL"] + "/sticker/" + stickerID + ".png")
-        .on('error', function(err) {
-            console.log(err)
-        })
-        .on('end', function() {
-            mainWindow.webContents.send(
-                "telegram-imported-sticker",
-                saveDir + "/" + stickerID + ".png"
-            );
-            telegramPending--;
-            if (telegramPending < 1) {
-                telegramImportWindow.webContents.send('import-complete', true);
-            }
-        })
-        .pipe(stream);
+    download(
+        [APP_CONFIG["STICKER_URL"] + "/sticker/" + stickerID + ".png"],
+        saveDir
+    ).then(result => {
+        mainWindow.webContents.send(
+            "telegram-imported-sticker",
+            result[0].filename
+        );
+        telegramPending--;
+        if (telegramPending < 1) {
+            telegramImportWindow.webContents.send('import-complete', true);
+        }
+    });
 }
 
 /**
