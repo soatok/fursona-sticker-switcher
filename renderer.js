@@ -117,7 +117,7 @@ function dragStopEvent(event) {
     if (dragOver === dragFrom) {
         return;
     }
-    myConsole.log({"from": dragFrom, "to": dragOver});
+    // myConsole.log({"from": dragFrom, "to": dragOver});
     activeProfile.moveImage(dragFrom, dragOver);
     ipc.send('unsaved-changes', true);
     dragOver = -1;
