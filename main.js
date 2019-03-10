@@ -115,7 +115,7 @@ function doTelegramImport(arg)
     let saveTo = arg['saveTo'];
 
     request(
-        APP_CONFIG["STICKER_URL"] + "/pack/" + sticker,
+        `${APP_CONFIG["STICKER_URL"]}/pack/${sticker}`,
         function (err, resp, body) {
             if (typeof(resp.statusCode) === "undefined") {
                 console.log("No status code defined");
@@ -144,7 +144,7 @@ function doTelegramImport(arg)
  */
 function downloadTelegramSticker(stickerID, saveDir) {
     /* Don't download it if it's already local. */
-    if (fs.existsSync(saveDir + "/" + stickerID + ".png")) {
+    if (fs.existsSync(`${saveDir}/${stickerID}.png`)) {
         telegramPending--;
         if (telegramPending < 1) {
             mainWindow.webContents.send('import-complete', true);
@@ -152,12 +152,12 @@ function downloadTelegramSticker(stickerID, saveDir) {
         }
         return mainWindow.webContents.send(
             "telegram-imported-sticker",
-            saveDir + "/" + stickerID + ".png"
+            `${saveDir}/${stickerID}.png`
         );
     }
     /* Fetch it. */
     download(
-        [APP_CONFIG["STICKER_URL"] + "/sticker/" + stickerID + ".png"],
+        [`${APP_CONFIG["STICKER_URL"]}/sticker/${stickerID}.png`],
         saveDir
     ).then(result => {
         mainWindow.webContents.send(

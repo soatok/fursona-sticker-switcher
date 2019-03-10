@@ -34,7 +34,7 @@ function appendImage(imageObject, index = 0) {
         $('#sticker-container').append(
             renderImagePreview(imageObject, index)
         );
-        $('.sticker[data-index=' + index + ']').on('click', stickerOnClickEvent);
+        $(`.sticker[data-index=${index}]`).on('click', stickerOnClickEvent);
     } catch (e) {
         myConsole.log(e);
     }
@@ -47,9 +47,9 @@ function contextMenuRemove() {
     let id = contextMenuTarget.getAttribute('id');
     let index = -1;
     if (id.match(/^image\-[0-9]+$/)) {
-        index = $("#" + id).data('index');
+        index = $(`#${id}`).data('index');
     } else if (id.match(/^image\-[0-9]+\-container$/)) {
-        index = $("#" + id + " img").data('index');
+        index = $(`#${id} img`).data('index');
     } else {
         return;
     }
@@ -73,7 +73,7 @@ function detectActiveSymlink() {
                 img = activeProfile.getImage(i);
                 if (fs.realpathSync(img['path']) === realpath) {
                     $('.active').removeClass('active');
-                    $('#image-' + i).addClass('active');
+                    $(`#image-${i}`).addClass('active');
                     return;
                 }
             }
@@ -87,7 +87,7 @@ function detectActiveSymlink() {
  */
 function dragStartEvent(event) {
     let id = event.data.source.getAttribute('id');
-    dragFrom = $("#"+id+" img").data('index');
+    dragFrom = $(`#${id} img`).data('index');
 }
 
 /**
@@ -95,7 +95,7 @@ function dragStartEvent(event) {
  */
 function dragOverEvent(event) {
     let id = event.over.getAttribute('id');
-    let temp = $("#"+id+" img").data('index');
+    let temp = $(`#${id} img`).data('index');
     if (event.mirror.getAttribute('id') === id) {
         return;
     }
@@ -185,7 +185,7 @@ function loadProfile(file) {
         myConsole.log(e);
         throw e;
     }
-    $(document).attr('title', activeProfile.getName() + " - Fursona Sticker Switcher");
+    $(document).attr('title', `${activeProfile.getName()} - Fursona Sticker Switcher`);
     activeProfilePath = file;
     config.set("lastProfile", activeProfilePath);
     config.save();
@@ -210,7 +210,7 @@ function menuSaveProfile() {
         }).then(function (r) {
             try {
                 activeProfile.setName(r);
-                $(document).attr('title', r + " - Fursona Sticker Switcher");
+                $(document).attr('title', `${r} - Fursona Sticker Switcher`);
                 if (activeProfilePath === "") {
                     return menuSaveProfileAs();
                 }
@@ -334,16 +334,16 @@ function renderTransparentImage() {
  * @returns {string}
  */
 function renderImagePreview(imageObject, index = 0) {
-    return "<div class=\"sticker draggable-source\" id=\"image-" + index + "-container\">" +
-        "<img " +
-            "id='image-" + index + "' " +
-            "title='image-" + index + "' " +
-            "alt='Click to choose sticker' " +
-            "data-index='" + index + "' " +
-            "data-path='" + escapeImagePath(imageObject.path) + "' " +
-            "src='file://" + escapeImagePath(imageObject.path) + "' " +
-        "/>" +
-        "</div>";
+    return `<div class="sticker draggable-source" id="image-${index}-container">` +
+        `<img ` +
+            `id='image-${index}' ` +
+            `title='image-${index}' ` +
+            `alt='Click to choose sticker' ` +
+            `data-index='${index}' ` +
+            `data-path='${escapeImagePath(imageObject.path)}' ` +
+            `src='file://${escapeImagePath(imageObject.path)}' ` +
+        `/>` +
+        `</div>`;
 }
 
 /**

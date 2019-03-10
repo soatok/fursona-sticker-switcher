@@ -69,9 +69,9 @@ $(document).ready(function() {
 
     if (typeof(lastDirectory) !== "string") {
         if (process.platform === "win32") {
-            lastDirectory = process.env.USERPROFILE + "\\Downloads\\Sticker Switcher";
+            lastDirectory = `${process.env.USERPROFILE}\\Downloads\\Sticker Switcher`;
         } else {
-            lastDirectory = process.env.HOME + "/Downloads/Sticker Switcher";
+            lastDirectory = `${process.env.HOME}/Downloads/Sticker Switcher`;
         }
         config.set('telegramStickerDir', lastDirectory);
         config.save();

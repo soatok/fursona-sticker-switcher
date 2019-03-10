@@ -120,14 +120,14 @@ class Stickers
             return new Stickers({
                 "version": 1,
                 "name": "",
-                "symlink": process.env.USERPROFILE + "\\" + Stickers.randomFileName(),
+                "symlink": `${process.env.USERPROFILE}\\${  Stickers.randomFileName()}`,
                 "images": []
             })
         }
         return new Stickers({
             "version": 1,
             "name": "",
-            "symlink": process.env.HOME + "/" + Stickers.randomFileName(),
+            "symlink": `${process.env.HOME}/${  Stickers.randomFileName()}`,
             "images": []
         })
     }
