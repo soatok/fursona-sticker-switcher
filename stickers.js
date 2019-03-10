@@ -1,6 +1,8 @@
 const arrayMove = require('array-move');
 const fs = require('fs');
 const randomInt = require('./csprng.js');
+const { app } = require('electron');
+const path = require('path');
 
 class Stickers
 {
@@ -116,18 +118,10 @@ class Stickers
      * @returns {Stickers}
      */
     static defaultProfile() {
-        if (process.platform === "win32") {
-            return new Stickers({
-                "version": 1,
-                "name": "",
-                "symlink": `${process.env.USERPROFILE}\\${  Stickers.randomFileName()}`,
-                "images": []
-            })
-        }
         return new Stickers({
             "version": 1,
             "name": "",
-            "symlink": `${process.env.HOME}/${  Stickers.randomFileName()}`,
+            "symlink": path.join(app.getPath("home"), Stickers.randomFileName()),
             "images": []
         })
     }

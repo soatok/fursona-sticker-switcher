@@ -1,10 +1,11 @@
 /** First, load prerequisites... **/
 const remote = require('electron').remote;
 const fs = require('fs');
-const ipc = require('electron').ipcRenderer;
 const Settings = require('./settings');
 const nodeConsole = require('console');
 const html5 = require('html-entities').Html5Entities;
+const path = require('path');
+const { app, ipcRenderer: ipc } = require('electron');
 
 /** Initialize some variables to be used throughout the lifetime of the app: */
 window.$ = window.jQuery = require('jquery');
@@ -68,11 +69,7 @@ $(document).ready(function() {
     let lastDirectory = config.get('telegramStickerDir');
 
     if (typeof(lastDirectory) !== "string") {
-        if (process.platform === "win32") {
-            lastDirectory = `${process.env.USERPROFILE}\\Downloads\\Sticker Switcher`;
-        } else {
-            lastDirectory = `${process.env.HOME}/Downloads/Sticker Switcher`;
-        }
+        lastDirectory = path.join(app.getPath("home"), "Downloads", "Sticker Switcher");
         config.set('telegramStickerDir', lastDirectory);
         config.save();
     }
