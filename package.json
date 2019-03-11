@@ -4,7 +4,9 @@
   "description": "Dynamic image swapping for furry live-streamers. (Character stills, Telegram stickers, etc.)",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "lint": "eslint .",
+    "fix": "eslint . --fix"
   },
   "build": {
     "win": {
@@ -22,7 +24,8 @@
   "author": "Soatok Dreamseeker",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^4.0.8"
+    "electron": "^4.0.8",
+    "eslint": "^5.15.1"
   },
   "dependencies": {
     "@shopify/draggable": "^1.0.0-beta.8",
