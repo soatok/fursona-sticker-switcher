@@ -7,13 +7,13 @@
 </head>
 <body>
 <div id="container">
-    <table>
+    <table id="import-telegram-table">
         <tr>
-            <td class="text-right">
-                <label for="sticker-url">Sticker URL:</label>
+            <td class="text-right" style="width: 100px;">
+                <label for="sticker-url">Sticker&nbsp;URL:</label>
             </td>
             <td>
-                <input type="text" name="sticker-url" id="sticker-url" />
+                <input type="text" name="sticker-url" id="sticker-url" placeholder="https://t.me/addstickers/..." />
             </td>
         </tr>
         <tr>
@@ -25,15 +25,11 @@
                 <input type="file" name="folder" id="folder" webkitdirectory />
             </td>
         </tr>
-        <tr>
-            <td class="text-right">
-                <button id="import-btn">Import</button>
-            </td>
-            <td>
-                <button id="cancel-btn">Cancel</button>
-            </td>
-        </tr>
     </table>
+    <div class="text-center">
+        <button id="import-btn">Import</button>
+        <button id="cancel-btn">Cancel</button>
+    </div>
 </div>
 <script>
     const nodeConsole = require('console');

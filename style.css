@@ -62,12 +62,24 @@ body {
 #sticker-container {
     outline: none;
 }
+.text-center {
+    text-align: center;
+}
 .text-right {
     text-align: right;
 }
 #current-folder {
+    white-space: nowrap;
+    padding-right: 0.5rem;
     min-height: 1rem;
 }
 .error-input {
     box-shadow: #f00 0 0 1px;
+}
+#import-telegram-table {
+    margin: auto;
+    width: calc(100% - 1rem);
+}
+#import-telegram-table #sticker-url {
+    width: 100%;
 }

@@ -180,10 +180,12 @@ function showTelegramImportWindow() {
         return;
     }
     telegramImportWindow = new BrowserWindow({
-        minWidth: 350,
-        minHeight: 150,
-        width: 360,
-        height: 160
+        maxWidth: 1920,
+        maxHeight: 130,
+        minWidth: 400,
+        minHeight: 130,
+        width: 400,
+        height: 130
     });
     telegramImportWindow.setMenuBarVisibility(false);
     telegramImportWindow.setMenu(null);
