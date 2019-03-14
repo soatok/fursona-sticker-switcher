@@ -170,7 +170,7 @@ function menuLoadProfile() {
     if (file.length < 1) {
         return;
     }
-    return loadProfile(file[0]);
+    loadProfile(file[0]);
 }
 
 /**
@@ -178,20 +178,17 @@ function menuLoadProfile() {
  *
  * @param {string} file
  */
-function loadProfile(file) {
-
+async function loadProfile(file) {
     // Load the profile from the given JSON file
     try {
-        (async() => {
-            activeProfile = await Stickers.loadFromProfile(file);
-            $(document).attr('title', `${activeProfile.getName()} - Fursona Sticker Switcher`);
-            activeProfilePath = file;
-            config.set("lastProfile", activeProfilePath);
-            config.save();
-            $('#symlink-path').val(activeProfile.getSymlink());
-            redrawImages(true);
-            ipc.send('unsaved-changes', false);
-        })();
+        activeProfile = await Stickers.loadFromProfile(file);
+        $(document).attr('title', `${activeProfile.getName()} - Fursona Sticker Switcher`);
+        activeProfilePath = file;
+        config.set("lastProfile", activeProfilePath);
+        config.save();
+        $('#symlink-path').val(activeProfile.getSymlink());
+        redrawImages(true);
+        ipc.send('unsaved-changes', false);
     } catch (e) {
         myConsole.log(e);
         throw e;
