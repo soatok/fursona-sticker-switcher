@@ -5,7 +5,8 @@ const Settings = require('./settings');
 const nodeConsole = require('console');
 const html5 = require('html-entities').Html5Entities;
 const path = require('path');
-const { app, ipcRenderer: ipc } = require('electron');
+const { ipcRenderer: ipc } = require('electron');
+const app = remote.app;
 
 /** Initialize some variables to be used throughout the lifetime of the app: */
 window.$ = window.jQuery = require('jquery');

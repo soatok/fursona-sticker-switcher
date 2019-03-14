@@ -54,7 +54,7 @@ function contextMenuRemove() {
         return;
     }
     activeProfile.removeSticker(index);
-    setTimeout(redrawImages, 1);
+    setTimeout(() => {return redrawImages(true);}, 1);
 }
 
 /**
@@ -124,7 +124,7 @@ function dragStopEvent(event) {
     ipc.send('unsaved-changes', true);
     dragOver = -1;
     dragFrom = -1;
-    setTimeout(redrawImages, 1);
+    setTimeout(() => {return redrawImages(true);}, 1);
 }
 
 /**
@@ -192,9 +192,8 @@ function loadProfile(file) {
     config.set("lastProfile", activeProfilePath);
     config.save();
     $('#symlink-path').val(activeProfile.getSymlink());
-    redrawImages();
+    redrawImages(true);
     ipc.send('unsaved-changes', false);
-    setTimeout(detectActiveSymlink, 1);
 }
 
 /**
@@ -236,14 +235,15 @@ function menuSaveFileCallback() {
     config.set("lastProfile", activeProfilePath);
     config.save();
     ipc.send('unsaved-changes', false);
-    return fs.writeFileSync(
+    fs.writeFile(
         activeProfilePath,
         JSON.stringify({
             "version": activeProfile.getVersion(),
             "name": activeProfile.getName(),
             "symlink": activeProfile.getSymlink(),
             "images": activeProfile.getAllImages()
-        })
+        }),
+        () => {}
     );
 }
 
@@ -298,7 +298,7 @@ function menuAddPhoto() {
 /**
  * Clears and redraws all of the images in the active profile.
  */
-function redrawImages() {
+function redrawImages(detect = false) {
     // Iterate through activeProfile.getImages(), call appendImage()
     $('#sticker-container').html(
         renderTransparentImage()
@@ -308,6 +308,9 @@ function redrawImages() {
         appendImage(activeProfile.getImage(i), i);
     }
     $('.sticker').on('click', stickerOnClickEvent);
+    if (detect) {
+        setTimeout(detectActiveSymlink, 1);
+    }
 }
 
 /**
@@ -370,12 +373,11 @@ function selectImage(activeImage) {
              serves the same purpose.
              */
             if (isWindowsAdmin) {
-                let result = fs.symlinkSync(activeImage, activeProfile.getSymlink());
-                changeTime(activeImage);
-                changeTime(activeProfile.getSymlink());
-                return result;
+                return fs.symlink(activeImage, activeProfile.getSymlink(), ()=>{
+                    changeTime(activeImage);
+                    changeTime(activeProfile.getSymlink());
+                });
             } else {
-                // Do this asynchronously because it could be slower.
                 return fs.copyFile(
                     activeImage,
                     activeProfile.getSymlink(),
@@ -386,10 +388,10 @@ function selectImage(activeImage) {
                 );
             }
         } else {
-            let result = fs.symlinkSync(activeImage, activeProfile.getSymlink());
-            changeTime(activeImage);
-            changeTime(activeProfile.getSymlink());
-            return result;
+            return fs.symlink(activeImage, activeProfile.getSymlink(), ()=>{
+                changeTime(activeImage);
+                changeTime(activeProfile.getSymlink());
+            });
         }
     } catch (e) {
         myConsole.log(e);
@@ -449,7 +451,7 @@ $(document).ready(function() {
         myConsole.log(e);
         menuNewProfile();
     }
-    redrawImages();
+    redrawImages(true);
     if (process.platform === "win32") {
         let exec = require('child_process').exec;
         exec('NET SESSION', function (err, so, se) {
