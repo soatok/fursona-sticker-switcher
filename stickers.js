@@ -3,6 +3,7 @@ const fs = require('fs');
 const randomInt = require('./csprng.js');
 const { app } = require('electron');
 const path = require('path');
+const fsp = require('fs').promises;
 
 class Stickers
 {
@@ -126,14 +127,26 @@ class Stickers
         })
     }
 
+    static async read(path) {
+        return await fsp.readFile(path).then(data => {return data});
+    }
+
     /**
      * Load a profile from the filesystem
      *
      * @param {string} path
      * @returns {Stickers}
      */
-    static loadFromProfile(path = "") {
-        return new Stickers(JSON.parse(fs.readFileSync(path).toString()));
+    static async loadFromProfile(path = "") {
+        return new Stickers(
+            JSON.parse(await Stickers.read(path))
+        );
+
+        return new Stickers(
+            JSON.parse(
+                fs.readFileSync(path).toString()
+            )
+        );
     }
 
     /**

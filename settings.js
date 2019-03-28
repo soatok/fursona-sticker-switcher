@@ -21,9 +21,10 @@ class Settings
     }
 
     save(path = "./settings.json") {
-        return fs.writeFileSync(
+        fs.writeFile(
             path,
-            JSON.stringify(this.config)
+            JSON.stringify(this.config),
+            () => {}
         );
     }
 
