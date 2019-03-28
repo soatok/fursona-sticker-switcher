@@ -23,6 +23,7 @@ let isWindowsAdmin = false;
 let config;
 let dragDrop;
 let draggedId;
+let draggedAtAll;
 
 /**
  * Append an image to the DOM.
@@ -89,7 +90,9 @@ function detectActiveSymlink() {
 function dragStartEvent(event) {
     let id = event.data.source.getAttribute('id');
     dragFrom = $(`#${id} img`).data('index');
+    dragOver = -1;
     draggedId = id;
+    draggedAtAll = false;
 }
 
 /**
@@ -106,8 +109,9 @@ function dragOverEvent(event) {
         }
         if (temp !== dragFrom) {
             dragOver = temp;
+            draggedAtAll = true;
         }
-        myConsole.log({"from": dragFrom, "to": dragOver, "tmp": temp});
+        // myConsole.log({"from": dragFrom, "to": dragOver, "tmp": temp});
     } catch(e) {
         myConsole.log(e);
     }
@@ -117,6 +121,12 @@ function dragOverEvent(event) {
  * @param {DragStopEvent} event
  */
 function dragStopEvent(event) {
+    if (!draggedAtAll) {
+        let target = $(`#image-${dragFrom}-container`);
+        selectImage(target.find("img").data("path"));
+        setTimeout(() => {return redrawImages(true);}, 1);
+        return;
+    }
     if (typeof dragOver === 'undefined') {
         return;
     }
@@ -467,7 +477,6 @@ $(document).ready(function() {
                 activeProfile.setSymlinkPath($(this).val());
             });
             try {
-                let el = document.getElementById('sticker-container');
                 dragDrop = new Sortable(
                     document.getElementById('sticker-container')
                 );
