@@ -22,6 +22,7 @@ let isWindowsAdmin = false;
 /** @var {Settings} config */
 let config;
 let dragDrop;
+let draggedId;
 
 /**
  * Append an image to the DOM.
@@ -88,21 +89,27 @@ function detectActiveSymlink() {
 function dragStartEvent(event) {
     let id = event.data.source.getAttribute('id');
     dragFrom = $(`#${id} img`).data('index');
+    draggedId = id;
 }
 
 /**
  * @param {DragOverEvent} event
  */
 function dragOverEvent(event) {
-    let id = event.over.getAttribute('id');
-    let temp = $(`#${id} img`).data('index');
-    if (typeof event.mirror !== 'undefined') {
-        if (event.mirror.getAttribute('id') === id) {
+    try {
+        let id = event.over.getAttribute('id');
+        let temp = $(`#${id} img`).data('index');
+        let mirrorId = $('.draggable--over').attr('id');
+        if (draggedId === mirrorId) {
+            dragOver = -1;
             return;
         }
-    }
-    if (temp !== dragFrom) {
-        dragOver = temp;
+        if (temp !== dragFrom) {
+            dragOver = temp;
+        }
+        myConsole.log({"from": dragFrom, "to": dragOver, "tmp": temp});
+    } catch(e) {
+        myConsole.log(e);
     }
 }
 
@@ -444,75 +451,81 @@ ipc.on('telegram-imported-sticker', (event, data) => {
  */
 $(document).ready(function() {
     config = Settings.load('./settings.json');
-    try {
-        loadProfile(config.get('lastProfile'));
-    } catch (e) {
-        myConsole.log(e);
-        menuNewProfile();
-    }
-    redrawImages(true);
-    if (process.platform === "win32") {
-        let exec = require('child_process').exec;
-        exec('NET SESSION', function (err, so, se) {
-            isWindowsAdmin = se.length === 0;
-        });
-    }
-    $("#symlink-path").on('change', function () {
-        activeProfile.setSymlinkPath($(this).val());
-    });
-    dragDrop = new Sortable(
-        document.getElementById('sticker-container')
-    );
-    dragDrop.on('drag:start', dragStartEvent);
-    dragDrop.on('drag:over', dragOverEvent);
-    dragDrop.on('drag:stop', dragStopEvent);
-
-    const imageMenu = new Menu();
-    imageMenu.append(
-        new MenuItem(
-            {
-                label: 'Remove Sticker',
-                click() {
-                    return contextMenuRemove();
-                }
+    loadProfile(config.get('lastProfile'))
+        .catch(function(e){
+            myConsole.log(e);
+            menuNewProfile();
+        }).then(function() {
+            redrawImages(true);
+            if (process.platform === "win32") {
+                let exec = require('child_process').exec;
+                exec('NET SESSION', function (err, so, se) {
+                    isWindowsAdmin = se.length === 0;
+                });
             }
-        )
-    );
+            $("#symlink-path").on('change', function () {
+                activeProfile.setSymlinkPath($(this).val());
+            });
+            try {
+                let el = document.getElementById('sticker-container');
+                dragDrop = new Sortable(
+                    document.getElementById('sticker-container')
+                );
+                dragDrop.on('drag:start', dragStartEvent);
+                dragDrop.on('drag:over', dragOverEvent);
+                dragDrop.on('drag:stop', dragStopEvent);
+            } catch (e) {
+                myConsole.log(e);
+                return;
+            }
 
-    /**
-     * Attaches the right menu to #sticker-container.
-     */
-    document
-        .getElementById('sticker-container')
-        .addEventListener(
-            'contextmenu',
-            (e) => {
-                contextMenuTarget = e.target;
-                e.preventDefault();
-                imageMenu.popup({window: remote.getCurrentWindow()})
-            },
-            false
-        );
+            const imageMenu = new Menu();
+            imageMenu.append(
+                new MenuItem(
+                    {
+                        label: 'Remove Sticker',
+                        click() {
+                            return contextMenuRemove();
+                        }
+                    }
+                )
+            );
 
-    /**
-     * Prevent the default behavior.
-     */
-    document.ondragover = document.ondrop = (ev) => {
-        ev.preventDefault();
-    };
+            /**
+             * Attaches the right menu to #sticker-container.
+             */
+            document
+                .getElementById('sticker-container')
+                .addEventListener(
+                    'contextmenu',
+                    (e) => {
+                        contextMenuTarget = e.target;
+                        e.preventDefault();
+                        imageMenu.popup({window: remote.getCurrentWindow()})
+                    },
+                    false
+                );
 
-    /**
-     * The ondrop handler allows us to add image files when they are
-     * dragged and dropped from outside the app. In our case, we simply
-     * iterate through them and add them to the current profile.
-     */
-    document.body.ondrop = (ev) => {
-        let newImage, newIndex;
-        newIndex = activeProfile.getImageCount();
-        for (let i = 0; i < ev.dataTransfer.files.length; i++) {
-            newImage = {"path": ev.dataTransfer.files[i].path};
-            activeProfile.appendImage(newImage);
-            appendImage(newImage, (newIndex + i));
-        }
-    };
+            /**
+             * Prevent the default behavior.
+             */
+            document.ondragover = document.ondrop = (ev) => {
+                ev.preventDefault();
+            };
+
+            /**
+             * The ondrop handler allows us to add image files when they are
+             * dragged and dropped from outside the app. In our case, we simply
+             * iterate through them and add them to the current profile.
+             */
+            document.body.ondrop = (ev) => {
+                let newImage, newIndex;
+                newIndex = activeProfile.getImageCount();
+                for (let i = 0; i < ev.dataTransfer.files.length; i++) {
+                    newImage = {"path": ev.dataTransfer.files[i].path};
+                    activeProfile.appendImage(newImage);
+                    appendImage(newImage, (newIndex + i));
+                }
+            };
+        });
 });
