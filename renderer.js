@@ -124,6 +124,7 @@ function dragStopEvent(event) {
     if (!draggedAtAll) {
         let target = $(`#image-${dragFrom}-container`);
         selectImage(target.find("img").data("path"));
+        ipc.send('unsaved-changes', true);
         setTimeout(() => {return redrawImages(true);}, 1);
         return;
     }
