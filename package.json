@@ -1,6 +1,6 @@
 {
   "name": "fursona-sticker-switcher",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "Dynamic image swapping for furry live-streamers. (Character stills, Telegram stickers, etc.)",
   "main": "main.js",
   "scripts": {
@@ -24,7 +24,7 @@
   "author": "Soatok Dreamseeker",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^4.0.8",
+    "electron": "^4.1.3",
     "eslint": "^5.15.1"
   },
   "dependencies": {
@@ -34,7 +34,7 @@
     "change-file-time": "^0.1.0",
     "electron-prompt": "^1.3.0",
     "html-entities": "^1.2.1",
-    "images-downloader": "github:soatok/images-downloader#v1.1.2",
+    "images-downloader": "github:soatok/images-downloader#v1.2.0",
     "jquery": "^3.3.1",
     "open": "^6.0.0",
     "request": "^2.88.0"

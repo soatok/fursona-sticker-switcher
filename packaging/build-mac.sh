@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-PREBUILT="https://github.com/electron/electron/releases/download/v4.1.1/electron-v4.1.1-darwin-x64.zip"
-VERSION="v0.3.2"
+PREBUILT="https://github.com/electron/electron/releases/download/v4.1.3/electron-v4.1.3-darwin-x64.zip"
+VERSION="v0.4.0"
 
 mkdir build-mac
 cd build-mac
