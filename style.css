@@ -83,3 +83,31 @@ body {
 #import-telegram-table #sticker-url {
     width: 100%;
 }
+
+#about-container * {
+    vertical-align: top;
+}
+#soatok {
+    width: 200px;
+    margin-left: -50px;
+}
+#about-content {
+    min-width: 240px;
+}
+.hyperlink {
+    color: #0cf;
+    cursor: pointer;
+    text-decoration: underline;
+}
+.hyperlink:hover {
+    color: #9df;
+}
+.hyperlink:active {
+    color: #39c;
+}
+.hyperlink:visited {
+    color: #cc99ff;
+}
+#about-container h1 {
+    margin: 0;
+}

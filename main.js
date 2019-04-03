@@ -15,6 +15,8 @@ let mainWindow;
 let telegramImportWindow;
 let haveUnsavedChanges;
 let telegramWindowOpen = false;
+let aboutWindow;
+let aboutWindowOpen = false;
 let telegramPending = 0;
 
 function callFunctionInWindow(name) {
@@ -25,6 +27,7 @@ function createIndexMenu() {
     const indexMenu = new Menu();
     const FileSubMenu = new Menu();
     const FileImportSubMenu = new Menu();
+    const HelpSubMenu = new Menu();
     FileSubMenu.append(
         new MenuItem({
             "label": "New Profile",
@@ -90,10 +93,26 @@ function createIndexMenu() {
         })
     );
 
+
+    HelpSubMenu.append(
+        new MenuItem({
+            "label": "About",
+            click() {
+                return showAboutWindow();
+            }
+        })
+    );
+
     indexMenu.append(
         new MenuItem({
             "label": "File",
             "submenu": FileSubMenu
+        })
+    );
+    indexMenu.append(
+        new MenuItem({
+            "label": "Help",
+            "submenu": HelpSubMenu
         })
     );
     return indexMenu
@@ -172,6 +191,31 @@ function downloadTelegramSticker(stickerID, saveDir) {
     });
 }
 
+/**
+ * Show Telegram import window if it's not already open.
+ */
+function showAboutWindow() {
+    if (aboutWindowOpen) {
+        return;
+    }
+    aboutWindow = new BrowserWindow({
+        maxWidth: 1920,
+        maxHeight: 1080,
+        minWidth: 500,
+        minHeight: 320,
+        width: 500,
+        height: 320
+    });
+    aboutWindow.setMenuBarVisibility(false);
+    aboutWindow.setMenu(null);
+
+    aboutWindow.loadFile('about.html');
+    aboutWindow.on('closed', function() {
+        aboutWindowOpen = false;
+        aboutWindow = null;
+    });
+    aboutWindowOpen = true;
+}
 /**
  * Show Telegram import window if it's not already open.
  */

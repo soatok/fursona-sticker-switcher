@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>About Fursona Sticker Switcher</title>
+    <link rel="stylesheet" href="./style.css" type="text/css" />
+</head>
+<body>
+    <div id="about-container">
+        <table>
+            <tr>
+                <td colspan="2">
+                    <h1>Fursona Sticker Switcher</h1>
+                </td>
+            </tr>
+            <tr>
+                <td id="about-content">
+                    <p>
+                        <strong>Fursona Sticker Switcher</strong> is a labor of love created
+                        by <a class="hyperlink" data-url="https://soatok.com">Soatok Dreamseeker</a>.
+                    </p>
+                    <p>
+                        This software is <a
+                            class="hyperlink"
+                            data-url="https://github.com/soatok/fursona-sticker-switcher"
+                        >free and open source</a>. If you'd like to contribute to its
+                        development&hellip;
+                    </p>
+                    <ul>
+                        <li>
+                            Join my <a class="hyperlink" data-url="https://patreon.com/soatok">Patreon</a>
+                        </li>
+                        <li>
+                            Donate via <a class="hyperlink" data-url="https://paypal.me/soatok">PayPal</a>
+                        </li>
+                        <li>
+                            Follow/subscribe to my <a class="hyperlink" data-url="https://twitch.tv/soatok">Twitch channel</a>
+                        </li>
+                    </ul>
+                    <p>Version 0.4.0</p>
+                </td>
+                <td>
+                    <img src="Soatok.png" alt="Soatok" id="soatok" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" class="text-center">
+                    <button id="okay-btn">OK</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <script>
+        const nodeConsole = require('console');
+        let myConsole = new nodeConsole.Console(process.stdout, process.stderr);
+        try {
+            require('./about.js');
+        } catch (e) {
+            myConsole.log(e);
+        }</script>
+</body>
+</html>
