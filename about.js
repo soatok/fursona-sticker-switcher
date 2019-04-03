@@ -1,4 +1,4 @@
-const open = require('open');
+const { shell } = require('electron');
 window.$ = window.jQuery = require('jquery');
 const remote = require('electron').remote;
 
@@ -13,6 +13,6 @@ function okayButtonPressed(e)
 }
 
 $(".hyperlink").on("click", function(e) {
-    open($(this).data('url'), 'firefox');
+    shell.openItem($(this).data('url'));
 });
 $("#okay-btn").on('click', okayButtonPressed);
