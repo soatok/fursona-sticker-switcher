@@ -333,6 +333,7 @@ function createWindow () {
 
     ipcMain.on('editTagComplete', (event, arg) => {
         mainWindow.webContents.send('editTagComplete', arg);
+        haveUnsavedChanges = true;
     });
 
     ipcMain.on('unsaved-changes', (event, arg) => {

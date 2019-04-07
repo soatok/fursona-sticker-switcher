@@ -208,10 +208,10 @@ function filterByTags(tagString) {
         image = activeProfile.getImage(i);
         for (let j = 0; j < tags.length; j++) {
             selectedTag = tags[j].trim();
-            if (typeof(image.tags === 'undefined')) {
+            if (typeof(image.tags) === 'undefined') {
                 break;
             }
-            if (selectedTag in image.tags) {
+            if (image.tags.includes(selectedTag)) {
                 indices.push(i);
                 break;
             }
@@ -221,7 +221,8 @@ function filterByTags(tagString) {
     let n;
     for (let i = 0; i < indices.length; i++) {
         n = indices[i];
-        $('#image-' + n).show(0);
+        myConsole.log(n);
+        $('#image-' + n + '-container').show(0);
     }
 }
 
