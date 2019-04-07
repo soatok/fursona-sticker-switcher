@@ -1,7 +1,7 @@
 const arrayMove = require('array-move');
 const fs = require('fs');
 const randomInt = require('./csprng.js');
-const { app } = require('electron');
+const { app } = require('electron').remote;
 const path = require('path');
 const fsp = require('fs').promises;
 
@@ -15,6 +15,7 @@ class Stickers
         this.name = data.name || "";
         this.symlink = data.symlink || "";
         this.images = data.images || [];
+        this.tags = data.tags || [];
     }
 
     addImageFromPath(path) {
@@ -44,6 +45,10 @@ class Stickers
      */
     getImage(index) {
         return this.images[index];
+    }
+
+    getImageTags(index) {
+        return this.images[index]['tags'] || [];
     }
 
     /**
@@ -96,6 +101,21 @@ class Stickers
     }
 
     /**
+     * Overwrite the tags for a given image.
+     *
+     * @param {int} index
+     * @param {array} tagArray
+     * @returns {Stickers}
+     */
+    setImageTags(index, tagArray) {
+        if (!Array.isArray(tagArray)) {
+            throw new TypeError("Must be an array of strings.");
+        }
+        this.images[index]['tags'] = tagArray;
+        return this;
+    }
+
+    /**
      * Sets the name of the current profile.
      *
      * @param {string} str
@@ -119,12 +139,17 @@ class Stickers
      * @returns {Stickers}
      */
     static defaultProfile() {
-        return new Stickers({
-            "version": 1,
-            "name": "",
-            "symlink": path.join(app.getPath("home"), Stickers.randomFileName()),
-            "images": []
-        })
+        try {
+            return new Stickers({
+                "version": 1,
+                "name": "",
+                "symlink": path.join(app.getPath("home"), Stickers.randomFileName()),
+                "images": [],
+                "tags": []
+            });
+        } catch (e) {
+            myConsole.log(e);
+        }
     }
 
     static async read(path) {

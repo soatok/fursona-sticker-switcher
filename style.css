@@ -10,6 +10,14 @@ body {
 #symlink-path {
     width: calc(100% - 110px);
 }
+#filter-container label {
+    display: inline-block;
+    text-align: right;
+    width: 100px;
+}
+#tag-filter {
+    width: calc(100% - 110px);
+}
 .sticker {
     background-color: #222;
     border-radius: 0.5ex;

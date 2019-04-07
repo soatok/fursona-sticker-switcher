@@ -24,6 +24,7 @@ let config;
 let dragDrop;
 let draggedId;
 let draggedAtAll;
+let filterActive = false;
 
 /**
  * Append an image to the DOM.
@@ -88,6 +89,9 @@ function detectActiveSymlink() {
  * @param {DragStartEvent} event
  */
 function dragStartEvent(event) {
+    if (filterActive) {
+        return;
+    }
     let id = event.data.source.getAttribute('id');
     dragFrom = $(`#${id} img`).data('index');
     dragOver = -1;
@@ -99,6 +103,9 @@ function dragStartEvent(event) {
  * @param {DragOverEvent} event
  */
 function dragOverEvent(event) {
+    if (filterActive) {
+        return;
+    }
     try {
         let id = event.over.getAttribute('id');
         let temp = $(`#${id} img`).data('index');
@@ -121,6 +128,9 @@ function dragOverEvent(event) {
  * @param {DragStopEvent} event
  */
 function dragStopEvent(event) {
+    if (filterActive) {
+        return;
+    }
     if (!draggedAtAll) {
         let target = $(`#image-${dragFrom}-container`);
         selectImage(target.find("img").data("path"));
@@ -153,6 +163,51 @@ function dragStopEvent(event) {
  */
 function escapeImagePath(str) {
     return str.split("'").join("%27");
+}
+
+/**
+ * Filter stickers based on tags being shown.
+ *
+ * @param {string} tagString
+ */
+function filterByTags(tagString) {
+    let tags = tagString.split(',');
+    if (tags.length === 0) {
+        filterActive = false;
+        $('.sticker').show();
+        return;
+    }
+    if (tags.length < 2) {
+        if (tags[0].trim() === '') {
+            filterActive = false;
+            $('.sticker').show();
+            return;
+        }
+    }
+    filterActive = true;
+
+    let selectedTag = '';
+    let indices = [];
+    let image;
+    for (let i = 0; i < activeProfile.getImageCount(); i++) {
+        image = activeProfile.getImage(i);
+        for (let j = 0; j < tags.length; j++) {
+            selectedTag = tags[j].trim();
+            if (typeof(image.tags === 'undefined')) {
+                break;
+            }
+            if (selectedTag in image.tags) {
+                indices.push(i);
+                break;
+            }
+        }
+    }
+    $('.real-sticker').hide(0);
+    let n;
+    for (let i = 0; i < indices.length; i++) {
+        n = indices[i];
+        $('#image-' + n).show(0);
+    }
 }
 
 /**
@@ -356,7 +411,7 @@ function renderTransparentImage() {
  * @returns {string}
  */
 function renderImagePreview(imageObject, index = 0) {
-    return `<div class="sticker draggable-source" id="image-${index}-container">` +
+    return `<div class="sticker real-sticker draggable-source" id="image-${index}-container">` +
         `<img ` +
             `id='image-${index}' ` +
             `title='image-${index}' ` +
@@ -476,6 +531,13 @@ $(document).ready(function() {
             }
             $("#symlink-path").on('change', function () {
                 activeProfile.setSymlinkPath($(this).val());
+            });
+            $("#tag-filter").on('change', function() {
+                try {
+                    filterByTags($(this).val());
+                } catch (e) {
+                    myConsole.log(e);
+                }
             });
             try {
                 dragDrop = new Sortable(
