@@ -6,7 +6,7 @@ const nodeConsole = require('console');
 const html5 = require('html-entities').Html5Entities;
 const path = require('path');
 const { ipcRenderer: ipc } = require('electron');
-const app = remote.app;
+const { app } = remote.app;
 
 /** Initialize some variables to be used throughout the lifetime of the app: */
 window.$ = window.jQuery = require('jquery');
@@ -36,7 +36,7 @@ function importButtonPressed(e)
         return remote.getCurrentWindow().close();
     });
 
-    ipc.send('telegram-import',  {
+    ipc.send('telegram-import', {
         "sticker": value,
         "saveTo": Settings.load('./settings.json').get('telegramStickerDir')
     });
@@ -69,20 +69,20 @@ $(document).ready(function() {
     let config = Settings.load('./settings.json');
     let lastDirectory = config.get('telegramStickerDir');
 
-    if (typeof(lastDirectory) !== "string") {
+    if (typeof (lastDirectory) !== "string") {
         lastDirectory = path.join(app.getPath("home"), "Downloads", "Sticker Switcher");
         config.set('telegramStickerDir', lastDirectory);
         config.save();
     }
     if (!fs.existsSync(lastDirectory)) {
-        fs.mkdir(lastDirectory);
+        fs.mkdir(lastDirectory, ()=>{});
     }
 
     if (lastDirectory.length > 0) {
         $("#current-folder").html(html5.encode(lastDirectory));
     }
 
-    $("#folder").on('change', function(e) {
+    $("#folder").on('change', function () {
         updateActiveDirectory();
         $("#folder").val("");
     });

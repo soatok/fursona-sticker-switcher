@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Tags</title>
+    <link rel="stylesheet" href="./style.css" type="text/css" />
+</head>
+<body>
+<div id="edit-tags-container">
+    <p id="sticker-preview"></p>
+    <label for="edit-tag">Tags (comma-separated):</label><br />
+    <div class="text-center">
+        <textarea id="edit-tag"></textarea>
+        <button id="edit-tag-submit">Save</button>
+    </div>
+</div>
+<script>
+    const nodeConsole = require('console');
+    let myConsole = new nodeConsole.Console(process.stdout, process.stderr);
+    try {
+        require('./edit-tags.js');
+    } catch (e) {
+        myConsole.log(e);
+    }</script>
+</body>
+</html>

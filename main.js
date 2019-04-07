@@ -17,6 +17,8 @@ let haveUnsavedChanges;
 let telegramWindowOpen = false;
 let aboutWindow;
 let aboutWindowOpen = false;
+let editTagWindow;
+let editTagWindowOpen = false;
 let telegramPending = 0;
 
 function callFunctionInWindow(name) {
@@ -145,11 +147,12 @@ function doTelegramImport(arg)
                 return;
             }
             let parsed = JSON.parse(body);
+            let packName = parsed.name;
             telegramPending = 0;
             // .forEachOf(obj, (value, key, callback) => {
             async.forEachOf(parsed.stickers, (sticker, key, callback) => {
                 telegramPending++;
-                downloadTelegramSticker(sticker.id, saveTo);
+                downloadTelegramSticker(sticker.id, saveTo, packName);
             });
         }
     );
@@ -160,8 +163,9 @@ function doTelegramImport(arg)
  *
  * @param {string} stickerID
  * @param {string} saveDir
+ * @param {string} packName
  */
-function downloadTelegramSticker(stickerID, saveDir) {
+function downloadTelegramSticker(stickerID, saveDir, packName) {
     /* Don't download it if it's already local. */
     if (fs.existsSync(`${saveDir}/${stickerID}.png`)) {
         telegramPending--;
@@ -171,7 +175,10 @@ function downloadTelegramSticker(stickerID, saveDir) {
         }
         return mainWindow.webContents.send(
             "telegram-imported-sticker",
-            `${saveDir}/${stickerID}.png`
+            {
+                "path": `${saveDir}/${stickerID}.png`,
+                "packName": packName
+            }
         );
     }
     /* Fetch it. */
@@ -181,7 +188,10 @@ function downloadTelegramSticker(stickerID, saveDir) {
     ).then(result => {
         mainWindow.webContents.send(
             "telegram-imported-sticker",
-            result[0].filename
+            {
+                "path": result[0].filename,
+                "packName": packName
+            }
         );
         telegramPending--;
         if (telegramPending < 1) {
@@ -192,7 +202,7 @@ function downloadTelegramSticker(stickerID, saveDir) {
 }
 
 /**
- * Show Telegram import window if it's not already open.
+ * Show about window if it's not already open.
  */
 function showAboutWindow() {
     if (aboutWindowOpen) {
@@ -216,6 +226,38 @@ function showAboutWindow() {
     });
     aboutWindowOpen = true;
 }
+
+/**
+ * Editing a tag.
+ *
+ * @param args
+ */
+function showEditTagWindow(args) {
+    if (editTagWindowOpen) {
+        return;
+    }
+    editTagWindow = new BrowserWindow({
+        maxWidth: 1920,
+        maxHeight: 1080,
+        minWidth: 500,
+        minHeight: 420,
+        width: 500,
+        height: 540
+    });
+    editTagWindow.setMenuBarVisibility(false);
+    editTagWindow.setMenu(null);
+
+    editTagWindow.loadFile('edit-tags.html');
+    editTagWindow.on('closed', function() {
+        editTagWindowOpen = false;
+        editTagWindow = null;
+    });
+    editTagWindowOpen = true;
+    ipcMain.on('tagsWindowLoaded', function() {
+        editTagWindow.webContents.send('mainWindowArgs', args);
+    });
+}
+
 /**
  * Show Telegram import window if it's not already open.
  */
@@ -291,6 +333,15 @@ function createWindow () {
 
     ipcMain.on('telegram-import', (event, arg) => {
         doTelegramImport(arg);
+    });
+
+    ipcMain.on('editTagMenu', (event, arg) => {
+        showEditTagWindow(arg);
+    });
+
+    ipcMain.on('editTagComplete', (event, arg) => {
+        mainWindow.webContents.send('editTagComplete', arg);
+        haveUnsavedChanges = true;
     });
 
     ipcMain.on('unsaved-changes', (event, arg) => {
