@@ -541,9 +541,13 @@ ipc.on('import-complete', (event, data) => {
 
 ipc.on('telegram-imported-sticker', (event, data) => {
     let newIndex = activeProfile.getImageCount();
-    activeProfile.appendImage({"path": data});
+    let imageObject = {
+        "path": data.path,
+        "tags": [data.packName]
+    };
+    activeProfile.appendImage(imageObject);
     ipc.send('unsaved-changes', true);
-    appendImage({"path": data}, newIndex);
+    appendImage(imageObject, newIndex);
 });
 
 /**

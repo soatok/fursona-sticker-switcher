@@ -147,11 +147,12 @@ function doTelegramImport(arg)
                 return;
             }
             let parsed = JSON.parse(body);
+            let packName = parsed.name;
             telegramPending = 0;
             // .forEachOf(obj, (value, key, callback) => {
             async.forEachOf(parsed.stickers, (sticker, key, callback) => {
                 telegramPending++;
-                downloadTelegramSticker(sticker.id, saveTo);
+                downloadTelegramSticker(sticker.id, saveTo, packName);
             });
         }
     );
@@ -162,8 +163,9 @@ function doTelegramImport(arg)
  *
  * @param {string} stickerID
  * @param {string} saveDir
+ * @param {string} packName
  */
-function downloadTelegramSticker(stickerID, saveDir) {
+function downloadTelegramSticker(stickerID, saveDir, packName) {
     /* Don't download it if it's already local. */
     if (fs.existsSync(`${saveDir}/${stickerID}.png`)) {
         telegramPending--;
@@ -173,7 +175,10 @@ function downloadTelegramSticker(stickerID, saveDir) {
         }
         return mainWindow.webContents.send(
             "telegram-imported-sticker",
-            `${saveDir}/${stickerID}.png`
+            {
+                "path": `${saveDir}/${stickerID}.png`,
+                "packName": packName
+            }
         );
     }
     /* Fetch it. */
@@ -183,7 +188,10 @@ function downloadTelegramSticker(stickerID, saveDir) {
     ).then(result => {
         mainWindow.webContents.send(
             "telegram-imported-sticker",
-            result[0].filename
+            {
+                "path": result[0].filename,
+                "packName": packName
+            }
         );
         telegramPending--;
         if (telegramPending < 1) {
