@@ -119,3 +119,14 @@ body {
 #about-container h1 {
     margin: 0;
 }
+#sticker-preview {
+    text-align: center;
+}
+#sticker-preview img {
+    max-width: 500px;
+    height: 400px;
+}
+#edit-tag {
+    width: calc(100% - 1ex);
+    min-height: 2.2rem;
+}

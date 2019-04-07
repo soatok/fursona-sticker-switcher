@@ -232,9 +232,9 @@ function showEditTagWindow(args) {
         maxWidth: 1920,
         maxHeight: 1080,
         minWidth: 500,
-        minHeight: 320,
+        minHeight: 420,
         width: 500,
-        height: 320
+        height: 540
     });
     editTagWindow.setMenuBarVisibility(false);
     editTagWindow.setMenu(null);
@@ -329,6 +329,10 @@ function createWindow () {
 
     ipcMain.on('editTagMenu', (event, arg) => {
         showEditTagWindow(arg);
+    });
+
+    ipcMain.on('editTagComplete', (event, arg) => {
+        mainWindow.webContents.send('editTagComplete', arg);
     });
 
     ipcMain.on('unsaved-changes', (event, arg) => {

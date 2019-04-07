@@ -19,10 +19,13 @@ class Stickers
     }
 
     addImageFromPath(path) {
-        this.appendImage({"path": path});
+        this.appendImage({"path": path, "tags": []});
     }
 
     appendImage(imageObject) {
+        if (typeof imageObject.tags === 'undefined') {
+            imageObject.tags = [];
+        }
         this.images.push(imageObject);
     }
 

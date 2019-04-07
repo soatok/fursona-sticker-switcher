@@ -52,7 +52,10 @@ function contextMenuEditTags() {
     } else {
         return;
     }
-    ipc.send('editTagMenu', index);
+    ipc.send('editTagMenu', {
+        "images": activeProfile.getAllImages(),
+        "id": index
+    });
 }
 
 /**
@@ -370,7 +373,7 @@ function menuAddPhoto() {
 
     // Append a photo
     for (let i = 0; i < files.length; i++) {
-        let newImage = {"path": files[i]};
+        let newImage = {"path": files[i], "tags": []};
         activeProfile.appendImage(newImage);
         appendImage(newImage, i);
     }
@@ -482,6 +485,20 @@ function selectImage(activeImage) {
     }
 }
 
+function updateTags(args) {
+    let id = args['id'];
+    let expectedPath = args['path'];
+    let tags = args['tags'];
+
+    let image = activeProfile.getImage(id);
+    if (image.path !== expectedPath) {
+        throw new Error(
+            `Expected path and path do not match: ${image.path}, ${expectedPath}`
+        );
+    }
+    activeProfile.setImageTags(id, tags);
+}
+
 /**
  * OnClick event handler for each sticker.
  */
@@ -512,6 +529,10 @@ ipc.on('parentFunc', (event, data) => {
         default:
             throw new Error("Function not allowed");
     }
+});
+
+ipc.on('editTagComplete', (event, data) => {
+    updateTags(data);
 });
 ipc.on('import-complete', (event, data) => {
     setTimeout(redrawImages, 1);
@@ -616,7 +637,7 @@ $(document).ready(function() {
                 let newImage, newIndex;
                 newIndex = activeProfile.getImageCount();
                 for (let i = 0; i < ev.dataTransfer.files.length; i++) {
-                    newImage = {"path": ev.dataTransfer.files[i].path};
+                    newImage = {"path": ev.dataTransfer.files[i].path, "tags": []};
                     activeProfile.appendImage(newImage);
                     appendImage(newImage, (newIndex + i));
                 }
