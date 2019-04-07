@@ -72,7 +72,12 @@ function contextMenuRemove() {
         return;
     }
     activeProfile.removeSticker(index);
-    setTimeout(() => {return redrawImages(true);}, 1);
+    setTimeout(() => {
+            redrawImages(true);
+            return filterByTags();
+        },
+        1
+    );
 }
 
 /**
@@ -182,10 +187,9 @@ function escapeImagePath(str) {
 
 /**
  * Filter stickers based on tags being shown.
- *
- * @param {string} tagString
  */
-function filterByTags(tagString) {
+function filterByTags() {
+    let tagString = $("#tag-filter").val();
     let tags = tagString.split(',');
     if (tags.length === 0) {
         filterActive = false;
@@ -221,7 +225,7 @@ function filterByTags(tagString) {
     let n;
     for (let i = 0; i < indices.length; i++) {
         n = indices[i];
-        myConsole.log(n);
+        // myConsole.log(n);
         $('#image-' + n + '-container').show(0);
     }
 }
@@ -572,7 +576,7 @@ $(document).ready(function() {
             });
             $("#tag-filter").on('change', function() {
                 try {
-                    filterByTags($(this).val());
+                    filterByTags();
                 } catch (e) {
                     myConsole.log(e);
                 }

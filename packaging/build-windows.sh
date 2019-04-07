@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-PREBUILT="https://github.com/electron/electron/releases/download/v4.1.3/electron-v4.1.3-win32-x64.zip"
+PREBUILT="https://github.com/electron/electron/releases/download/v4.1.4/electron-v4.1.4-win32-x64.zip"
 VERSION="v0.4.0"
 
 mkdir build-win
