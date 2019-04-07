@@ -17,6 +17,8 @@ let haveUnsavedChanges;
 let telegramWindowOpen = false;
 let aboutWindow;
 let aboutWindowOpen = false;
+let editTagWindow;
+let editTagWindowOpen = false;
 let telegramPending = 0;
 
 function callFunctionInWindow(name) {
@@ -192,7 +194,7 @@ function downloadTelegramSticker(stickerID, saveDir) {
 }
 
 /**
- * Show Telegram import window if it's not already open.
+ * Show about window if it's not already open.
  */
 function showAboutWindow() {
     if (aboutWindowOpen) {
@@ -216,6 +218,38 @@ function showAboutWindow() {
     });
     aboutWindowOpen = true;
 }
+
+/**
+ * Editing a tag.
+ *
+ * @param args
+ */
+function showEditTagWindow(args) {
+    if (editTagWindowOpen) {
+        return;
+    }
+    editTagWindow = new BrowserWindow({
+        maxWidth: 1920,
+        maxHeight: 1080,
+        minWidth: 500,
+        minHeight: 320,
+        width: 500,
+        height: 320
+    });
+    editTagWindow.setMenuBarVisibility(false);
+    editTagWindow.setMenu(null);
+
+    editTagWindow.loadFile('edit-tags.html');
+    editTagWindow.on('closed', function() {
+        editTagWindowOpen = false;
+        editTagWindow = null;
+    });
+    editTagWindowOpen = true;
+    ipcMain.on('tagsWindowLoaded', function() {
+        editTagWindow.webContents.send('mainWindowArgs', args);
+    });
+}
+
 /**
  * Show Telegram import window if it's not already open.
  */
@@ -291,6 +325,10 @@ function createWindow () {
 
     ipcMain.on('telegram-import', (event, arg) => {
         doTelegramImport(arg);
+    });
+
+    ipcMain.on('editTagMenu', (event, arg) => {
+        showEditTagWindow(arg);
     });
 
     ipcMain.on('unsaved-changes', (event, arg) => {

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Tags</title>
+    <link rel="stylesheet" href="./style.css" type="text/css" />
+</head>
+<body>
+<div id="edit-tags-container">
+</div>
+<script>
+    const nodeConsole = require('console');
+    let myConsole = new nodeConsole.Console(process.stdout, process.stderr);
+    try {
+        require('./edit-tags.js');
+    } catch (e) {
+        myConsole.log(e);
+    }</script>
+</body>
+</html>

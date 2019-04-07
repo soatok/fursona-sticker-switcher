@@ -43,6 +43,18 @@ function appendImage(imageObject, index = 0) {
     }
 }
 
+function contextMenuEditTags() {
+    let id = contextMenuTarget.getAttribute('id');
+    if (id.match(/^image\-[0-9]+$/)) {
+        index = $(`#${id}`).data('index');
+    } else if (id.match(/^image\-[0-9]+\-container$/)) {
+        index = $(`#${id} img`).data('index');
+    } else {
+        return;
+    }
+    ipc.send('editTagMenu', index);
+}
+
 /**
  * Delete a sticker from the pack.
  */
@@ -558,6 +570,16 @@ $(document).ready(function() {
                         label: 'Remove Sticker',
                         click() {
                             return contextMenuRemove();
+                        }
+                    }
+                )
+            );
+            imageMenu.append(
+                new MenuItem(
+                    {
+                        label: 'Edit Tags',
+                        click() {
+                            return contextMenuEditTags();
                         }
                     }
                 )
