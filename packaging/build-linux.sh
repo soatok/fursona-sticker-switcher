@@ -14,6 +14,11 @@ cd app
 # git tag -v $VERSION
 npm install
 rm -rf .git
+# Precompile
+cd node_modules/node-hid
+node-pre-gyp install --target-platform=linux
+cd ../..
+# Back to app dir
 cd ..
 cd ..
 zip "../fursona-sticker-switcher-${VERSION}-linux.zip" -r ./*
