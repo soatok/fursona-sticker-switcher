@@ -1,4 +1,4 @@
-# Fursona Sticker Switcher
+# Fursona Sticker Switcher [![Support on Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fsoatok&style=flat)](https://patreon.com/soatok)
 
 ![App Screenshot](docs/img/fursona-stickers-01.png)
 
