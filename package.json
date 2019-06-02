@@ -36,7 +36,7 @@
     "elgato-stream-deck": "github:soatok/node-elgato-stream-deck#v2.2.0",
     "html-entities": "^1.2.1",
     "images-downloader": "github:soatok/images-downloader#v1.2.0",
-    "jquery": "^3.3.1",
+    "jquery": "^3.4.1",
     "node-pre-gyp": "^0.12.0",
     "request": "^2.88.0"
   }
