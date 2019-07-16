@@ -24,7 +24,7 @@
   "author": "Soatok Dreamseeker",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^4.1.4",
+    "electron": "^4.2.6",
     "eslint": "^5.15.1"
   },
   "dependencies": {
