@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "rebuild": "electron-rebuild -f -w elgato-stream-deck",
     "lint": "eslint .",
     "fix": "eslint . --fix"
   },
