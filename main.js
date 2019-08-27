@@ -20,6 +20,7 @@ let aboutWindowOpen = false;
 let editTagWindow;
 let editTagWindowOpen = false;
 let telegramPending = 0;
+let streamDeckMenuElement;
 
 function callFunctionInWindow(name) {
     return mainWindow.webContents.send('parentFunc', name);
@@ -76,6 +77,19 @@ function createIndexMenu() {
             }
         })
     );
+    streamDeckMenuElement = new MenuItem({
+        "label": "Elgato Stream Deck",
+        "type": "checkbox",
+        click() {
+            console.log(streamDeckMenuElement.checked);
+            if (streamDeckMenuElement.checked) {
+                return callFunctionInWindow('menuEnableElgatoStreamDeck');
+            } else {
+                return callFunctionInWindow('menuDisableElgatoStreamDeck');
+            }
+        }
+    });
+    FileSubMenu.append(streamDeckMenuElement);
     FileImportSubMenu.append(
         new MenuItem({
             "label": "Telegram",
@@ -214,7 +228,10 @@ function showAboutWindow() {
         minWidth: 500,
         minHeight: 320,
         width: 500,
-        height: 320
+        height: 320,
+        webPreferences: {
+            nodeIntegration: true,
+        }
     });
     aboutWindow.setMenuBarVisibility(false);
     aboutWindow.setMenu(null);
@@ -242,7 +259,10 @@ function showEditTagWindow(args) {
         minWidth: 500,
         minHeight: 420,
         width: 500,
-        height: 540
+        height: 540,
+        webPreferences: {
+            nodeIntegration: true,
+        }
     });
     editTagWindow.setMenuBarVisibility(false);
     editTagWindow.setMenu(null);
@@ -271,7 +291,10 @@ function showTelegramImportWindow() {
         minWidth: 400,
         minHeight: 130,
         width: 400,
-        height: 130
+        height: 130,
+        webPreferences: {
+            nodeIntegration: true,
+        }
     });
     telegramImportWindow.setMenuBarVisibility(false);
     telegramImportWindow.setMenu(null);
@@ -290,7 +313,10 @@ function createWindow () {
         minWidth: 280,
         minHeight: 220,
         width: 810,
-        height: 600
+        height: 600,
+        webPreferences: {
+            nodeIntegration: true,
+        }
     });
 
     // and load the index.html of the app.

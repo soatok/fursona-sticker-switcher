@@ -10,6 +10,7 @@ const prompt = require('electron-prompt');
 const Settings = require('./settings');
 const { Sortable } = require('@shopify/draggable');
 const Stickers = require('./stickers.js');
+const { openStreamDeck } = require('elgato-stream-deck');
 
 /** Initialize some variables to be used throughout the lifetime of the app: */
 window.$ = window.jQuery = require('jquery');
@@ -25,6 +26,7 @@ let dragDrop;
 let draggedId;
 let draggedAtAll;
 let filterActive = false;
+let streamDeck;
 
 /**
  * Append an image to the DOM.
@@ -289,6 +291,38 @@ async function loadProfile(file) {
 }
 
 /**
+ * File > Elgato Stream Deck uncheck
+ */
+function menuDisableElgatoStreamDeck()
+{
+    activeProfile.setStreamDeck(false);
+    streamDeck = null;
+}
+
+/**
+ * File > Elgato Stream Deck uncheck
+ */
+function menuEnableElgatoStreamDeck()
+{
+    activeProfile.setStreamDeck(true);
+    streamDeckInit();
+}
+
+function streamDeckInit()
+{
+    myConsole.log("init");
+    try {
+        streamDeck = openStreamDeck();
+        streamDeck.on('down', keyIndex => {
+            myConsole.log("key %d down", keyIndex);
+        });
+    } catch (e) {
+        myConsole.log(e.message);
+        myConsole.log(e);
+    }
+}
+
+/**
  * Called by the main process when the user presses
  * File > Save Profile
  */
@@ -531,6 +565,10 @@ ipc.on('parentFunc', (event, data) => {
             return menuSaveProfileAs();
         case "menuAddPhoto":
             return menuAddPhoto();
+        case "menuDisableElgatoStreamDeck":
+            return menuDisableElgatoStreamDeck();
+        case "menuEnableElgatoStreamDeck":
+            return menuEnableElgatoStreamDeck();
         default:
             throw new Error("Function not allowed");
     }

@@ -11,10 +11,11 @@ class Stickers
         if (typeof(data) !== "object") {
             throw TypeError("An object was expected");
         }
-        this.version = data.version || 1;
+        this.version = data.version || 2;
         this.name = data.name || "";
         this.symlink = data.symlink || "";
         this.images = data.images || [];
+        this.streamDeck = data.streamDeck || false;
         this.tags = data.tags || [];
     }
 
@@ -82,6 +83,13 @@ class Stickers
     }
 
     /**
+     * @returns {boolean}
+     */
+    getStreamDeck() {
+        return this.streamDeck;
+    }
+
+    /**
      * Gets the file path of the current symlink.
      *
      * @returns {string}
@@ -128,6 +136,13 @@ class Stickers
     }
 
     /**
+     * @param {boolean} bool
+     */
+    setStreamDeck(bool) {
+        this.streamDeck = bool;
+    }
+
+    /**
      * Sets the symlink path.
      *
      * @param {string} str
@@ -148,7 +163,8 @@ class Stickers
                 "name": "",
                 "symlink": path.join(app.getPath("home"), Stickers.randomFileName()),
                 "images": [],
-                "tags": []
+                "tags": [],
+                "streamDeck": false
             });
         } catch (e) {
             myConsole.log(e);
