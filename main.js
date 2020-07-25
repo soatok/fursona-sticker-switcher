@@ -209,6 +209,7 @@ function showAboutWindow() {
         return;
     }
     aboutWindow = new BrowserWindow({
+        webPreferences: {nodeIntegration: true},
         maxWidth: 1920,
         maxHeight: 1080,
         minWidth: 500,
@@ -242,6 +243,7 @@ function showEditTagWindow(args) {
         minWidth: 500,
         minHeight: 420,
         width: 500,
+        webPreferences: {nodeIntegration: true},
         height: 540
     });
     editTagWindow.setMenuBarVisibility(false);
@@ -266,6 +268,7 @@ function showTelegramImportWindow() {
         return;
     }
     telegramImportWindow = new BrowserWindow({
+        webPreferences: {nodeIntegration: true},
         maxWidth: 1920,
         maxHeight: 130,
         minWidth: 400,
@@ -287,6 +290,7 @@ function showTelegramImportWindow() {
 function createWindow () {
     // Create the browser window.
     mainWindow = new BrowserWindow({
+        webPreferences: {nodeIntegration: true},
         minWidth: 280,
         minHeight: 220,
         width: 810,

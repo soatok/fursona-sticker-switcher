@@ -156,7 +156,10 @@ class Stickers
     }
 
     static async read(path) {
-        return await fsp.readFile(path).then(data => {return data});
+        if (path === null) {
+            return '{}';
+        }
+        return fsp.readFile(path);
     }
 
     /**
@@ -168,12 +171,6 @@ class Stickers
     static async loadFromProfile(path = "") {
         return new Stickers(
             JSON.parse(await Stickers.read(path))
-        );
-
-        return new Stickers(
-            JSON.parse(
-                fs.readFileSync(path).toString()
-            )
         );
     }
 

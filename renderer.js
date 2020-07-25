@@ -64,9 +64,9 @@ function contextMenuEditTags() {
 function contextMenuRemove() {
     let id = contextMenuTarget.getAttribute('id');
     let index = -1;
-    if (id.match(/^image\-[0-9]+$/)) {
+    if (id.match(/^image-[0-9]+$/)) {
         index = $(`#${id}`).data('index');
-    } else if (id.match(/^image\-[0-9]+\-container$/)) {
+    } else if (id.match(/^image-[0-9]+-container$/)) {
         index = $(`#${id} img`).data('index');
     } else {
         return;
@@ -226,7 +226,7 @@ function filterByTags() {
     for (let i = 0; i < indices.length; i++) {
         n = indices[i];
         // myConsole.log(n);
-        $('#image-' + n + '-container').show(0);
+        $(`#image-${  n  }-container`).show(0);
     }
 }
 
@@ -273,6 +273,9 @@ function menuLoadProfile() {
  */
 async function loadProfile(file) {
     // Load the profile from the given JSON file
+    if (!(typeof file === 'string')) {
+        throw new TypeError('Empty file');
+    }
     try {
         activeProfile = await Stickers.loadFromProfile(file);
         $(document).attr('title', `${activeProfile.getName()} - Fursona Sticker Switcher`);
@@ -561,7 +564,9 @@ $(document).ready(function() {
     config = Settings.load('./settings.json');
     loadProfile(config.get('lastProfile'))
         .catch(function(e){
-            myConsole.log(e);
+            if (e.message !== 'Empty file') {
+                myConsole.log(e);
+            }
             menuNewProfile();
         }).then(function() {
             redrawImages(true);
