@@ -30,7 +30,7 @@
   "dependencies": {
     "@shopify/draggable": "^1.0.0-beta.12",
     "array-move": "^3.0.1",
-    "async": "^3.2.0",
+    "async": "^3.2.2",
     "change-file-time": "github:soatok/change-file-time#v0.2.0",
     "electron-prompt": "^1.6.2",
     "html-entities": "^1.4.0",
